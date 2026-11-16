@@ -1,0 +1,10 @@
+_site/
+report.md
+.DS_Store
+Thumbs.db
+desktop.ini
+*.psd
+*.ai
+*.rar
+*.zip
+__pycache__/

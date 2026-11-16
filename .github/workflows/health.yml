@@ -1,0 +1,72 @@
+# Checks the live website every 30 minutes (and after every publish).
+# If something is wrong it opens an issue titled "Website health alert", which
+# emails everyone watching the repo; when the site is healthy again it closes it.
+name: Website health
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_run:
+    workflows: ["Publish website"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pages: read
+
+concurrency:
+  group: health
+  cancel-in-progress: true
+
+jobs:
+  health:
+    name: Live site check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Find the site address and published commit
+        id: site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url=$(gh api "repos/${{ github.repository }}/pages" --jq .html_url)
+          echo "url=${url%/}" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Check the live site
+        id: check
+        continue-on-error: true
+        env:
+          SITE_URL: ${{ steps.site.outputs.url }}
+          SITE_SHA: ${{ steps.site.outputs.sha }}
+          SITE_LIVE: ${{ vars.SITE_LIVE }}
+        run: python3 tools/check_live.py
+      - name: Show report
+        if: always()
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Open or update the alert
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh issue list --repo "${{ github.repository }}" --state open --search "Website health alert in:title" --json number --jq '.[0].number')
+          if [ -z "$n" ]; then
+            gh issue create --repo "${{ github.repository }}" --title "🔴 Website health alert" --body-file report.md
+          else
+            gh issue comment "$n" --repo "${{ github.repository }}" --body-file report.md
+          fi
+          exit 1
+      - name: Close the alert when healthy again
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh issue list --repo "${{ github.repository }}" --state open --search "Website health alert in:title" --json number --jq '.[0].number')
+          if [ -n "$n" ]; then
+            gh issue close "$n" --repo "${{ github.repository }}" --comment "✅ The website is healthy again. $(date -u '+%Y-%m-%d %H:%M UTC')"
+          fi

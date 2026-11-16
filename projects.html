@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src https://formsubmit.co; form-action 'self' https://formsubmit.co; frame-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<script src="assets/js/boot.js"></script>
+<title>Projects — WABI Architects | Architecture, Interiors &amp; Finishing Portfolio</title>
+<meta name="description" content="Projects by WABI Architects in Addis Ababa — cafés, homes, hotels, offices and towers, each with photos, drawings and the building drawn to scale.">
+<meta name="theme-color" content="#08080a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Projects — WABI Architects | Architecture, Interiors &amp; Finishing Portfolio">
+<meta property="og:description" content="Projects by WABI Architects in Addis Ababa — cafés, homes, hotels, offices and towers, each with photos, drawings and the building drawn to scale.">
+<meta property="og:image" content="https://wabiarchitects.unaux.com/assets/img/og.jpg">
+<meta property="og:url" content="https://wabiarchitects.unaux.com/projects.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Outfit:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/home.css">
+<link rel="stylesheet" href="assets/css/projects.css">
+<link rel="stylesheet" href="assets/css/pages.css">
+</head>
+<body>
+
+<!-- overlays -->
+<div class="grain" aria-hidden="true"></div>
+<div id="cursor" aria-hidden="true"></div>
+<div class="scroll-prog" id="scrollProg" aria-hidden="true"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a class="brand" href="index.html" aria-label="WABI Architects — home">
+    <img src="assets/img/logo-white.png" alt="WABI Architects">
+  </a>
+  <nav class="nav">
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html" class="active">Projects</a>
+      <a href="services.html">Services</a>
+      <a href="finishing.html">Finishing</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <a href="contact.html" class="cta">Start a Project</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- MOBILE MENU OVERLAY -->
+<div class="menu-overlay">
+  <nav>
+    <a href="index.html">Home <span>00</span></a>
+    <a href="about.html">About <span>01</span></a>
+    <a href="projects.html">Projects <span>02</span></a>
+    <a href="services.html">Services <span>03</span></a>
+    <a href="finishing.html">Finishing <span>04</span></a>
+    <a href="contact.html">Contact <span>05</span></a>
+  </nav>
+  <div class="menu-foot">
+    Addis Ababa, Ethiopia<br>
+    <a href="tel:+251967138783">+251 967 138 783</a> · <a href="tel:+251920526598">+251 920 526 598</a><br>
+    <a href="mailto:wabiarchitects00@gmail.com">wabiarchitects00@gmail.com</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- PAGE HERO — the cover from the original WABI site -->
+  <section class="page-hero">
+    <div class="ph-media"><img src="assets/img/projects-cover.jpg" alt="Ascent Hotel rooftop pool lounge, designed by WABI"></div>
+    <div class="ph-top">
+      <span class="label">Portfolio — Projects</span>
+      <div class="ph-count">Design · Finishing · Architecture<br>Addis Ababa &amp; beyond</div>
+    </div>
+    <h1 class="wide">The work, <em class="nw">room by room</em><br>and floor by floor.</h1>
+    <div class="ph-sub">
+      <p>Every project with its photos, drawings and the building drawn to scale — from cafés and homes
+        to hotels, offices and high-rise towers.</p>
+      <span class="scroll-cue">Scroll to explore</span>
+    </div>
+  </section>
+
+  <!-- REGISTER -->
+  <section class="reg" id="register">
+    <div class="section-head">
+      <span class="label reveal">The register — 01</span>
+      <h2 class="reveal" data-delay="1">Every project,<br>drawn and documented</h2>
+      <p class="reveal" data-delay="2">Filter by work or building type, switch between cards and a list,
+        and open any project for its gallery, drawings and details.</p>
+    </div>
+    <div class="fstats reg-stats reveal" id="regStats"></div>
+    <div class="reg-bar" id="regBar"></div>
+    <p class="reg-count" id="regCount" aria-live="polite"></p>
+    <div class="reg-grid is-cards" id="regGrid"></div>
+    <noscript><p class="reg-empty">Turn on JavaScript to browse the projects, or <a href="contact.html">contact us</a> for our portfolio.</p></noscript>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-bg"><img src="assets/img/hero-final.jpg" alt="" loading="lazy"></div>
+    <span class="label no-tick reveal" style="justify-content:center">Next step</span>
+    <h2 class="reveal" data-delay="1">Have a project in mind?</h2>
+    <p class="reveal" data-delay="1">From a single room to a full tower — tell us about your site and we'll take it from drawing to tile.</p>
+    <div class="reveal" data-delay="2" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-solid" href="contact.html">Start a project <span class="ar">→</span></a>
+      <a class="btn btn-ghost" href="https://wa.me/251920526598" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+  </section>
+
+<!-- PROJECT VIEW (filled by assets/js/projects.js) -->
+<div class="psheet" id="psheet" role="dialog" aria-modal="true" aria-labelledby="ps-title" hidden></div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="f-word">WABI</div>
+  <div class="f-grid">
+    <div class="lead">
+      <img src="assets/img/logo-white.png" alt="WABI Architects">
+      <p>Architecture, interior design and finishing studio in Addis Ababa, Ethiopia — one team
+        from the first drawing to the final tile.</p>
+    </div>
+    <div class="f-col">
+      <h5>Explore</h5>
+      <ul>
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="finishing.html">Finishing</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="tel:+251967138783">+251 967 138 783</a></li>
+        <li><a href="tel:+251920526598">+251 920 526 598</a></li>
+        <li><a href="mailto:wabiarchitects00@gmail.com">wabiarchitects00@gmail.com</a></li>
+        <li><a href="https://wa.me/251920526598" target="_blank" rel="noopener">WhatsApp</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <h5>Studio</h5>
+      <ul>
+        <li><a href="contact.html">Addis Ababa, Ethiopia</a></li>
+        <li><a href="contact.html">Start a Project</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="f-bottom">
+    <span>© <span id="year">2026</span> WABI Architects — All rights reserved</span>
+    <span>Design &amp; Finishing — Addis Ababa</span>
+  </div>
+</footer>
+
+<a class="wa-btn" href="https://wa.me/251920526598?text=Hello%20WABI%20Architects%2C%20I%27d%20like%20to%20discuss%20a%20project." target="_blank" rel="noopener" aria-label="Chat with WABI on WhatsApp">
+  <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.6 6L4 29l8.2-1.5c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.8l-.6-.3-4.9.9 1-4.7-.4-.6c-.9-1.5-1.4-3.2-1.4-4.9 0-5.4 4.4-9.8 9.8-9.8s9.8 4.4 9.8 9.8-4.4 9.4-9.8 9.4zm5.4-7.1c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5s-.7-1.7-.9-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+</a>
+
+<script src="assets/js/home.js"></script>
+<script src="assets/js/projects-data.js"></script>
+<script src="assets/js/sketch.js"></script>
+<script src="assets/js/projects.js"></script>
+</body>
+</html>

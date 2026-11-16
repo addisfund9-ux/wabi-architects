@@ -1,0 +1,4 @@
+# Changes to these need Dagi's approval (when "Require review from Code Owners" is on).
+/.github/   @addisfund9-ux
+/tools/     @addisfund9-ux
+*           @addisfund9-ux
