@@ -113,19 +113,69 @@
     check(); // reveal whatever is already in view
   })();
 
-  /* ---------- HERO video: day-to-night city model, fades in over the still once it plays.
-     Skipped for reduced motion and data-saver; paused when the hero is off screen. */
+  /* ---------- HERO film: the city model goes from day to night as you scroll ----------
+     Scroll down = forward, scroll up = back; it never plays on its own. The film is 41
+     stills stacked on top of each other; scrolling only changes which two are visible and
+     how far the upper one has faded in. That is pure compositing, so it stays in step with
+     the scroll on every phone (seeking a real <video> stutters on Android).
+     Reduced-motion and data-saver visitors keep the daytime still. */
   (function () {
-    var v = document.querySelector('.hero-video'); if (!v) return;
+    var film = document.querySelector('.hero-film'), hero = document.querySelector('.hero');
+    if (!film || !hero) return;
     var save = navigator.connection && navigator.connection.saveData;
-    if (reduce || save) { v.removeAttribute('autoplay'); v.pause(); v.remove(); return; }
-    v.parentNode.classList.add('has-video');
-    var show = function () { v.classList.add('playing'); };
-    v.addEventListener('playing', show); if (!v.paused && v.readyState > 2) show();
-    var p = v.play(); if (p && p.catch) p.catch(function () {});
-    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) {
-      if (e[0].isIntersecting) { var q = v.play(); if (q && q.catch) q.catch(function () {}); } else v.pause();
-    }).observe(v);
+    if (reduce || save) { film.remove(); return; }
+    var N = 41, set = (window.innerWidth / window.innerHeight < 0.8) ? 'p' : 'l';
+    var base = 'assets/media/hero-seq/' + set + '/';
+    var frames = new Array(N), ok = new Array(N), dec = new Array(N);
+    var target = 0, cur = 0, raf = 0, H = hero.offsetHeight, shownA = -1, shownB = -1, lastT = -1;
+    film.parentNode.classList.add('has-video');
+    for (var n = 0; n < N; n++) { var im = document.createElement('img'); im.alt = ''; im.decoding = 'async'; frames[n] = im; film.appendChild(im); }
+
+    function pad(i) { return (i < 10 ? '0' : '') + i; }
+    function load(i, done) {
+      var im = frames[i];
+      im.onload = function () { ok[i] = true; if (done) done(); if (Math.abs(i - cur * (N - 1)) < 3 && !raf) { lastT = -1; raf = requestAnimationFrame(tick); } };
+      im.onerror = function () { if (done) done(); };
+      im.src = base + pad(i) + '.webp';
+    }
+    function warm(i) {   // decode a frame before it is needed, off the main thread
+      if (i < 0 || i >= N || !ok[i] || dec[i]) return;
+      dec[i] = true; if (frames[i].decode) frames[i].decode().catch(function () {});
+    }
+    function have(i) { while (i > 0 && !ok[i]) i--; return ok[i] ? i : -1; }
+    function hide(i) { if (i >= 0) frames[i].style.visibility = 'hidden'; }
+    function draw(f) {
+      var c = Math.floor(f); for (var k = -2; k <= 4; k++) warm(c + k);
+      var a = have(c); if (a < 0) return;
+      var b = (a === c && a + 1 < N && ok[a + 1]) ? a + 1 : -1;
+      var t = b < 0 ? 0 : Math.round((f - a) * 20) / 20;
+      if (a === shownA && b === shownB && t === lastT) return;
+      if (shownA !== a && shownA !== b) hide(shownA);
+      if (shownB !== a && shownB !== b) hide(shownB);
+      frames[a].style.opacity = 1; frames[a].style.visibility = 'visible';
+      if (b >= 0) { frames[b].style.opacity = t; frames[b].style.visibility = t > 0 ? 'visible' : 'hidden'; }
+      shownA = a; shownB = b; lastT = t;
+    }
+    function tick() {
+      raf = 0;
+      cur += (target - cur) * .22;
+      if (Math.abs(target - cur) < .0005) cur = target;
+      draw(cur * (N - 1));
+      if (cur !== target) raf = requestAnimationFrame(tick);
+    }
+    function onScroll() {
+      var y = window.pageYOffset; if (y > H * 1.05 && target === 1 && cur === 1) return;
+      target = Math.min(1, Math.max(0, y / (H * (fine ? .8 : .55))));
+      if (!raf) raf = requestAnimationFrame(tick);
+    }
+    load(0, function () {
+      onScroll(); cur = target; draw(cur * (N - 1)); film.classList.add('on');
+      var i = 1; (function next() {            // fetch the rest in order, four at a time
+        for (var k = 0; k < 4 && i < N; k++, i++) load(i, k === 3 || i === N - 1 ? next : null);
+      })();
+    });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function () { H = hero.offsetHeight; });
   })();
 
   /* ---------- HERO depth ----------
@@ -304,6 +354,13 @@
     var imgs = Array.prototype.slice.call(flow.querySelectorAll('.flow-media img'));
     var capN = flow.querySelector('.fc-num'), capT = flow.querySelector('.fc-name');
     var last = steps.length - 1, current = -1;
+    /* phones: a copy of each step's picture sits inside the step (the big picture is hidden there) */
+    imgs.forEach(function (im) {
+      var st = steps[+im.dataset.step]; if (!st || st.querySelector('.ft-img')) return;
+      var t = document.createElement('img');
+      t.className = 'ft-img' + (im.classList.contains('fit') ? ' fit' : ''); t.src = im.getAttribute('src');
+      t.alt = im.alt; t.loading = 'lazy'; t.decoding = 'async'; st.appendChild(t);
+    });
     var mq = window.matchMedia('(max-width:820px)');
     var stage = flow.querySelector('.flow-stage'), pin = flow.querySelector('.flow-pin');
     var pinTop = pin ? (parseFloat(getComputedStyle(pin).top) || 0) : 0, pinH = pin ? pin.offsetHeight : 0;
@@ -335,8 +392,7 @@
         var y0 = dotCenterY(steps[0]), y1 = dotCenterY(steps[last]);
         var tTop = track.getBoundingClientRect().top;
         line.style.top = (y0 - tTop) + 'px'; line.style.height = (y1 - y0) + 'px'; line.style.bottom = 'auto';
-        var mediaBottom = flow.querySelector('.flow-media').getBoundingClientRect().bottom;
-        var trig = Math.max(mediaBottom + 40, vh * 0.62);
+        var trig = vh * 0.6;
         p = (trig - y0) / Math.max(1, (y1 - y0));
       } else {
         if (line.style.top) { line.style.top = ''; line.style.height = ''; line.style.bottom = ''; }

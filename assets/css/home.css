@@ -121,9 +121,10 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:400;line-height:1.02;letter-s
 .hero-media{position:absolute;inset:0;z-index:-2}
 .hero-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);
   will-change:transform;animation:kenburns 24s ease-in-out infinite alternate}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  opacity:0;transition:opacity 1.2s ease}
-.hero-video.playing{opacity:1}
+.hero-film{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+.hero-film.on{opacity:1}
+.hero-media .hero-film img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;visibility:hidden;
+  transform:none!important;animation:none!important}
 .hero-media.has-video img{animation:none;transform:none}
 @keyframes kenburns{0%{transform:scale(1.08) translate(0,0)}100%{transform:scale(1.18) translate(-2%,-2%)}}
 .hero-media::after{content:"";position:absolute;inset:0;
@@ -390,7 +391,7 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
   .reveal,.reveal-img,.hero h1 .line > span,.hero-sub{opacity:1!important;transform:none!important;clip-path:none!important}
   #preloader{display:none}
   .hero-media img{transform:scale(1.05)!important}
-  .hero-video{display:none}
+  .hero-film{display:none}
 }
 
 /* ============================================================
@@ -655,7 +656,17 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
    (moving/scaling a playing video while scrolling stutters on many Android phones),
    and no live blur behind the header. */
 @media (hover:none),(pointer:coarse){
-  .hero-media img,.hero-video{transform:none!important;animation:none!important}
+  .hero-media img,.hero-film{transform:none!important;animation:none!important}
   .site-header,.site-header.scrolled{backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .3s}
   .site-header.scrolled{background:rgba(8,8,10,.94)}
+}
+
+/* process steps: each step carries its own picture on phones, so nothing slides over the text */
+.ft-img{display:none}
+@media (max-width:820px){
+  .flow-media{display:none}
+  .ft-img{display:block;width:calc(100% - 33px);margin:14px 0 4px 33px;aspect-ratio:16/10;object-fit:cover;
+    border-radius:4px;border:1px solid var(--line);opacity:.55;transition:opacity .5s var(--ease)}
+  .ft-img.fit{object-fit:contain;background:#0d0f13}
+  .ft-step.on .ft-img,.ft-step.done .ft-img{opacity:1}
 }
