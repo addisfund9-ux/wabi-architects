@@ -618,3 +618,35 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 
 /* drawings in the process strip: show the whole sheet, never crop it */
 .flow-media img.fit{object-fit:contain;background:#0d0f13}
+
+/* hero-scroll-timeline — the parallax runs on the browser's compositor, in step with the
+   scroll itself, so it can't lag or stutter (Chrome, Edge, Samsung Internet, Safari 26+).
+   Older browsers get the desktop-only JS fallback in home.js, or a still hero. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .hero-media,.page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri{animation:px-media linear both}
+    .hero h1 .line:nth-child(1),.page-hero h1{animation:px-l1 linear both}
+    .hero h1 .line:nth-child(2){animation:px-l2 linear both}
+    .hero h1 .line:nth-child(3){animation:px-l3 linear both}
+    .hero-top,.page-hero .ph-top{animation:px-top linear both}
+    .hero-sub,.page-hero .ph-sub{animation:px-sub linear both}
+    .hero-frame{animation:px-frame linear both}
+    .hero-sky{animation:px-sky linear both}
+    .hero .hero-media,.page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri,.hero h1 .line,.page-hero h1,
+    .hero-top,.page-hero .ph-top,.hero-sub,.page-hero .ph-sub,.hero-frame,.hero-sky{
+      animation-timeline:scroll(root block);animation-range:0 100svh}
+  }
+}
+@keyframes px-media{to{transform:translate3d(0,42svh,0) scale(1.14)}}
+@keyframes px-l1{to{transform:translate3d(0,-6svh,0);opacity:0}}
+@keyframes px-l2{to{transform:translate3d(0,-13svh,0);opacity:0}}
+@keyframes px-l3{to{transform:translate3d(0,-20svh,0);opacity:0}}
+@keyframes px-top{40%,to{transform:translate3d(0,-14svh,0);opacity:0}}
+@keyframes px-sub{45%,to{transform:translate3d(0,-8svh,0);opacity:0}}
+@keyframes px-frame{75%,to{transform:scale(1.06);opacity:0}}
+@keyframes px-sky{to{transform:translate3d(0,20svh,0);opacity:0}}
+/* phones: the film-grain overlay is blended over the moving video on every frame — skip it */
+@media (hover:none){.grain{display:none}}
+/* soft hand-off from the hero into the page instead of a hard edge */
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:22svh;z-index:-1;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(8,8,10,0),var(--bg))}

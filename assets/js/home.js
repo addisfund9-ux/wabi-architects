@@ -95,10 +95,12 @@
     function check() {
       ticking = false;
       var vh = window.innerHeight || document.documentElement.clientHeight;
+      var show = [];   // read every position first, then change classes (no layout thrashing)
       for (var i = els.length - 1; i >= 0; i--) {
         var r = els[i].getBoundingClientRect();
-        if (r.top < vh * 0.92 && r.bottom > 0) { els[i].classList.add('in'); els.splice(i, 1); }
+        if (r.top < vh * 0.92 && r.bottom > 0) { show.push(els[i]); els.splice(i, 1); }
       }
+      for (var k = 0; k < show.length; k++) show[k].classList.add('in');
       if (!els.length) {
         window.removeEventListener('scroll', onScroll);
         window.removeEventListener('resize', onScroll);
@@ -126,49 +128,59 @@
     }).observe(v);
   })();
 
-  /* ---------- HERO depth: layered scroll + pointer parallax ----------
-     background drifts slower than the page, each headline line rises at
-     its own speed, the gold tower outline sits in between. Works on the
-     homepage hero and on every inner page hero. */
+  /* ---------- HERO depth ----------
+     Scroll parallax is pure CSS (scroll-driven animations, see home.css) so it moves exactly
+     with the scroll. Here: a gentle pointer drift on desktop (uses the separate `translate`
+     property, so it never fights the scroll transforms), and a JS scroll fallback for
+     desktop browsers without scroll-driven animations. Touch screens without support get a
+     still hero rather than a laggy one. */
   (function () {
     var hero = document.querySelector('.hero') || document.querySelector('.page-hero');
     if (!hero || reduce) return;
     var media = hero.querySelector('.hero-media, .ph-media, .ph-split, .ph-tri');
     var lines = [].slice.call(hero.querySelectorAll('h1 .line'));
+    var sky = hero.querySelector('.hero-sky');
+    var cssScroll = window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()');
+
+    if (fine) {   // pointer drift
+      var px = 0, py = 0, tx = 0, ty = 0, raf = 0;
+      var step = function () {
+        tx += (px - tx) * .08; ty += (py - ty) * .08;
+        if (media) media.style.translate = (-tx * 20).toFixed(1) + 'px ' + (-ty * 12).toFixed(1) + 'px';
+        if (sky) sky.style.translate = (tx * 30).toFixed(1) + 'px 0';
+        lines.forEach(function (l, i) { l.style.translate = (tx * (6 + i * 5)).toFixed(1) + 'px 0'; });
+        raf = (Math.abs(px - tx) > .002 || Math.abs(py - ty) > .002) ? requestAnimationFrame(step) : 0;
+      };
+      hero.addEventListener('mousemove', function (e) {
+        px = e.clientX / window.innerWidth - .5; py = e.clientY / window.innerHeight - .5;
+        if (!raf) raf = requestAnimationFrame(step);
+      });
+      hero.addEventListener('mouseleave', function () { px = 0; py = 0; if (!raf) raf = requestAnimationFrame(step); });
+    }
+
+    if (cssScroll || !fine) return;   // compositor handles it, or a touch screen: done
+
+    /* fallback (desktop Firefox / older Safari): same motion in JS, transforms only */
     var h1 = hero.querySelector('h1'), top = hero.querySelector('.hero-top, .ph-top');
     var sub = hero.querySelector('.hero-sub, .ph-sub'), frame = hero.querySelector('.hero-frame');
-    var sky = hero.querySelector('.hero-sky');
-    var H = hero.offsetHeight, px = 0, py = 0, tx = 0, ty = 0, queued = false;
-    function set(el, tr, op) { if (!el) return; el.style.transform = tr; if (op !== undefined) el.style.opacity = op; }
-    function frameTick() {
+    var H = window.innerHeight, queued = false;
+    function set(el, tr, op) { if (el) { el.style.transform = tr; el.style.opacity = op; } }
+    function tick() {
       queued = false;
-      var y = window.pageYOffset || document.documentElement.scrollTop;
-      if (y > H * 1.2) return;
-      tx += (px - tx) * .08; ty += (py - ty) * .08;
+      var y = window.pageYOffset; if (y > H * 1.1) return;
       var p = Math.min(Math.max(y / H, 0), 1);
-      set(media, 'translate3d(' + (-tx * 22).toFixed(1) + 'px,' + (y * .45 - ty * 14).toFixed(1) + 'px,0) scale(' + (1.05 + p * .1).toFixed(3) + ')');
-      set(sky, 'translate3d(' + (tx * 34).toFixed(1) + 'px,' + (y * .2).toFixed(1) + 'px,0)', (0.9 - p * .9).toFixed(3));
-      set(frame, 'scale(' + (1 + p * .07).toFixed(3) + ')', (1 - p * 1.4).toFixed(3));
-      if (y > 2) {
-        if (lines.length) lines.forEach(function (l, i) { l.style.transform = 'translate3d(' + (tx * (6 + i * 5)).toFixed(1) + 'px,' + (-y * (.06 + i * .07)).toFixed(1) + 'px,0)'; });
-        else set(h1, 'translate3d(' + (tx * 8).toFixed(1) + 'px,' + (-y * .16).toFixed(1) + 'px,0)');
-        if (h1) h1.style.opacity = (1 - p * 1.15).toFixed(3);
-        set(top, 'translate3d(0,' + (-y * .32).toFixed(1) + 'px,0)', (1 - p * 1.9).toFixed(3));
-        set(sub, 'translate3d(0,' + (-y * .16).toFixed(1) + 'px,0)', (1 - p * 1.7).toFixed(3));
-      } else {
-        lines.forEach(function (l) { l.style.transform = 'translate3d(' + (tx * 8).toFixed(1) + 'px,0,0)'; });
-        [h1, top, sub].forEach(function (el) { if (el) { el.style.opacity = ''; if (!lines.length || el !== h1) el.style.transform = ''; } });
-      }
-      if (Math.abs(px - tx) > .002 || Math.abs(py - ty) > .002) queue();
+      if (media) media.style.transform = 'translate3d(0,' + (y * .42).toFixed(1) + 'px,0) scale(' + (1 + p * .14).toFixed(3) + ')';
+      if (y < 2) { [h1, top, sub, frame, sky].concat(lines).forEach(function (el) { if (el) { el.style.transform = ''; el.style.opacity = ''; } }); return; }
+      if (lines.length) lines.forEach(function (l, i) { set(l, 'translate3d(0,' + (-y * (.06 + i * .07)).toFixed(1) + 'px,0)', (1 - p).toFixed(3)); });
+      else set(h1, 'translate3d(0,' + (-y * .06).toFixed(1) + 'px,0)', (1 - p).toFixed(3));
+      set(top, 'translate3d(0,' + (-y * .33).toFixed(1) + 'px,0)', Math.max(0, 1 - p / .6).toFixed(3));
+      set(sub, 'translate3d(0,' + (-y * .17).toFixed(1) + 'px,0)', Math.max(0, 1 - p / .65).toFixed(3));
+      set(frame, 'scale(' + (1 + p * .06).toFixed(3) + ')', Math.max(0, 1 - p / .75).toFixed(3));
+      set(sky, 'translate3d(0,' + (y * .2).toFixed(1) + 'px,0)', (1 - p).toFixed(3));
     }
-    function queue() { if (!queued) { queued = true; requestAnimationFrame(frameTick); } }
-    window.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', function () { H = hero.offsetHeight; queue(); });
-    if (fine) {
-      hero.addEventListener('mousemove', function (e) { px = e.clientX / window.innerWidth - .5; py = e.clientY / window.innerHeight - .5; queue(); });
-      hero.addEventListener('mouseleave', function () { px = 0; py = 0; queue(); });
-    }
-    frameTick();
+    window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(tick); } }, { passive: true });
+    window.addEventListener('resize', function () { H = window.innerHeight; });
+    tick();
   })();
 
   /* ---------- COUNT-UP stats ---------- */
@@ -268,15 +280,17 @@
     var ticking = false;
     function update() {
       ticking = false;
-      var h = document.documentElement;
-      var max = h.scrollHeight - h.clientHeight;
-      var p = max > 0 ? (h.scrollTop || window.scrollY) / max : 0;
+      var p = max > 0 ? window.scrollY / max : 0;
       bar.style.transform = 'scaleX(' + p + ')';
     }
+    var max = 0;
+    function measure() { max = document.documentElement.scrollHeight - window.innerHeight; }
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
-    update();
+    window.addEventListener('resize', measure); window.addEventListener('load', function () { measure(); update(); });
+    if (window.ResizeObserver) new ResizeObserver(measure).observe(document.body);
+    measure(); update();
   })();
 
   /* ---------- DESIGN & FINISHING process line ---------- */
@@ -291,6 +305,9 @@
     var capN = flow.querySelector('.fc-num'), capT = flow.querySelector('.fc-name');
     var last = steps.length - 1, current = -1;
     var mq = window.matchMedia('(max-width:820px)');
+    var stage = flow.querySelector('.flow-stage'), pin = flow.querySelector('.flow-pin');
+    var pinTop = pin ? (parseFloat(getComputedStyle(pin).top) || 0) : 0, pinH = pin ? pin.offsetHeight : 0;
+    window.addEventListener('resize', function () { if (pin) { pinTop = parseFloat(getComputedStyle(pin).top) || 0; pinH = pin.offsetHeight; } });
 
     function setActive(i) {
       if (i === current) return;
@@ -322,12 +339,10 @@
         var trig = Math.max(mediaBottom + 40, vh * 0.62);
         p = (trig - y0) / Math.max(1, (y1 - y0));
       } else {
-        line.style.top = ''; line.style.height = ''; line.style.bottom = '';
-        var stage = flow.querySelector('.flow-stage');
-        var pin = flow.querySelector('.flow-pin');
+        if (line.style.top) { line.style.top = ''; line.style.height = ''; line.style.bottom = ''; }
         var r = stage.getBoundingClientRect();
-        var topOff = parseFloat(getComputedStyle(pin).top) || 0;
-        var total = r.height - pin.offsetHeight;
+        var topOff = pinTop;
+        var total = r.height - pinH;
         p = (topOff - r.top) / Math.max(1, total);
       }
       p = Math.max(0, Math.min(1, p));
@@ -338,9 +353,13 @@
     if (reduce) {               // no scroll-driven motion: full line, tap to switch
       setFill(1); setActive(0);
     } else {
-      var ticking = false;
+      var ticking = false, near = true;
+      if ('IntersectionObserver' in window) {   // only track the scroll while the section is near the screen
+        new IntersectionObserver(function (e) { near = e[0].isIntersecting; if (near) update(); },
+          { rootMargin: '200px 0px' }).observe(flow);
+      }
       window.addEventListener('scroll', function () {
-        if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; update(); }); }
+        if (near && !ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; update(); }); }
       }, { passive: true });
       window.addEventListener('resize', update, { passive: true });
       update();
