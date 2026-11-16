@@ -181,8 +181,9 @@
   padding:46px clamp(18px,3vw,34px) 26px;display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,40px);align-items:end}
 .t-elev .ecap{position:absolute;top:16px;left:18px;font-family:var(--mono);font-size:.64rem;letter-spacing:.2em;
   text-transform:uppercase;color:var(--muted)}
-.t-elev.in-desc{margin:26px 0 6px;max-width:560px}
-.t-elev.in-desc .e-draw svg{height:clamp(170px,17vw,220px)}
+.t-elev.in-desc{margin:26px 0 6px;max-width:560px;grid-template-columns:minmax(120px,38%) 1fr;align-items:center}
+.t-elev.in-desc .e-draw{display:flex;justify-content:center}
+.t-elev.in-desc .e-draw svg{height:auto;width:100%;max-height:230px}
 .e-draw svg{display:block;height:clamp(220px,24vw,290px);width:auto;overflow:visible}
 .e-facts dl{border-top:1px solid var(--line)}
 .e-facts dl div{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line-soft)}
@@ -418,3 +419,10 @@ html.no-scroll{overflow:hidden}
 
 /* contact-form bot trap: invisible to people */
 .hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+
+/* phones: drawing on top, facts underneath — no empty corner */
+@media (max-width:560px){
+  .t-elev,.t-elev.in-desc{grid-template-columns:1fr;gap:6px;padding-top:42px}
+  .t-elev .e-draw{display:flex;justify-content:center}
+  .t-elev .e-draw svg{height:auto;width:min(100%,280px);max-height:210px}
+}

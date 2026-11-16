@@ -111,6 +111,21 @@
     check(); // reveal whatever is already in view
   })();
 
+  /* ---------- HERO video: day-to-night city model, fades in over the still once it plays.
+     Skipped for reduced motion and data-saver; paused when the hero is off screen. */
+  (function () {
+    var v = document.querySelector('.hero-video'); if (!v) return;
+    var save = navigator.connection && navigator.connection.saveData;
+    if (reduce || save) { v.removeAttribute('autoplay'); v.pause(); v.remove(); return; }
+    v.parentNode.classList.add('has-video');
+    var show = function () { v.classList.add('playing'); };
+    v.addEventListener('playing', show); if (!v.paused && v.readyState > 2) show();
+    var p = v.play(); if (p && p.catch) p.catch(function () {});
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (e) {
+      if (e[0].isIntersecting) { var q = v.play(); if (q && q.catch) q.catch(function () {}); } else v.pause();
+    }).observe(v);
+  })();
+
   /* ---------- HERO depth: layered scroll + pointer parallax ----------
      background drifts slower than the page, each headline line rises at
      its own speed, the gold tower outline sits in between. Works on the
@@ -185,26 +200,61 @@
 
   /* ---------- WORKS INDEX hover preview ---------- */
   (function () {
-    if (!fine) return;
-    var rows = document.querySelectorAll('.wi-row[data-img]');
+    var rows = [].slice.call(document.querySelectorAll('.wi-row[data-img]'));
     var preview = document.querySelector('.wi-preview');
-    if (!rows.length || !preview) return;
-    var img = preview.querySelector('img');
-    var tx = 0, ty = 0, px = 0, py = 0, active = false;
-    document.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; });
-    (function loop() {
-      px += (tx - px) * 0.14; py += (ty - py) * 0.14;
-      preview.style.left = px + 'px'; preview.style.top = py + 'px';
-      requestAnimationFrame(loop);
-    })();
+    if (!rows.length) return;
+    /* phones / touch: no hover, so each row carries its own small picture */
+    if (!fine || !preview) {
+      rows.forEach(function (row) {
+        if (row.querySelector('.wi-thumb')) return;
+        var t = document.createElement('img');
+        t.className = 'wi-thumb'; t.src = row.dataset.img; t.alt = ''; t.loading = 'lazy'; t.decoding = 'async';
+        row.appendChild(t);
+      });
+      return;
+    }
+    /* desktop: picture follows the pointer, beside it (not on top of the title) */
+    var img = preview.querySelector('img'), cache = {};
+    function load(src) {
+      if (!cache[src]) cache[src] = new Promise(function (ok) {
+        var i = new Image(); i.decoding = 'async';
+        i.onload = i.onerror = function () { ok(src); }; i.src = src;
+      });
+      return cache[src];
+    }
+    if ('IntersectionObserver' in window) {   // fetch the pictures as the list comes into view
+      var io = new IntersectionObserver(function (e) {
+        if (e[0].isIntersecting) { rows.forEach(function (r) { load(r.dataset.img); }); io.disconnect(); }
+      }, { rootMargin: '600px 0px' });
+      io.observe(rows[0].parentNode);
+    }
+    var tx = 0, ty = 0, px = 0, py = 0, on = false, raf = 0, cur = null, W = 320, H = 240;
+    function place() {
+      var x = px + 28, y = py - H / 2;
+      if (x + W > window.innerWidth - 16) x = px - W - 28;          // flip to the left near the edge
+      y = Math.max(76, Math.min(y, window.innerHeight - H - 16));
+      preview.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+    }
+    function loop() {
+      px += (tx - px) * 0.2; py += (ty - py) * 0.2; place();
+      raf = (on || Math.abs(tx - px) > .5 || Math.abs(ty - py) > .5) ? requestAnimationFrame(loop) : 0;
+    }
+    document.addEventListener('mousemove', function (e) { tx = e.clientX; ty = e.clientY; if (on && !raf) raf = requestAnimationFrame(loop); }, { passive: true });
     rows.forEach(function (row) {
-      row.addEventListener('mouseenter', function () {
-        img.src = row.dataset.img; preview.classList.add('show'); active = true;
+      row.addEventListener('mouseenter', function (e) {
+        tx = e.clientX; ty = e.clientY;
+        if (!on) { px = tx; py = ty; }                              // appear where the pointer is
+        var r = preview.getBoundingClientRect(); W = r.width || W; H = r.height || H;
+        on = true; cur = row.dataset.img; place();
+        load(cur).then(function (src) {
+          if (src !== cur || !on) return;
+          img.src = src; preview.classList.add('show');
+        });
+        if (!raf) raf = requestAnimationFrame(loop);
       });
-      row.addEventListener('mouseleave', function () {
-        preview.classList.remove('show'); active = false;
-      });
+      row.addEventListener('mouseleave', function () { on = false; cur = null; preview.classList.remove('show'); });
     });
+    window.addEventListener('scroll', function () { if (on) { on = false; cur = null; preview.classList.remove('show'); } }, { passive: true });
   })();
 
   /* ---------- CONTACT-independent: current year ---------- */

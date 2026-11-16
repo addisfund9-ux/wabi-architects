@@ -70,7 +70,7 @@
       '<div><dt>Floors above ground</dt><dd>' + S.levels(t).g + '</dd></div><div><dt>Basement levels</dt><dd>' + S.levels(t).b + '</dd></div>';
     facts += '<div><dt>Status</dt><dd>' + esc(t.status || '—') + '</dd></div>';
     var tags = ((t.finishing && t.finishing.tags) || t.scope || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('');
-    return '<div class="t-elev' + cls + '"><span class="ecap">Elevation · drawn to scale</span><div class="e-draw">' + S.elevation(t, { shared: SC }) + '</div>' +
+    return '<div class="t-elev' + cls + '"><span class="ecap">Elevation · drawn to scale</span><div class="e-draw">' + S.elevation(t, cls ? {} : { shared: SC }) + '</div>' +
       '<div class="e-facts"><dl>' + facts + '</dl><p class="e-k">Our scope</p><ul>' + tags + '</ul></div></div>';
   }
   function tower(t, i) {

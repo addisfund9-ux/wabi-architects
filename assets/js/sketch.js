@@ -86,7 +86,8 @@
     var h = ['<g stroke="' + FAINT + '" stroke-width=".6">'];
     for (var hx = 6; hx < W - 4; hx += 7) { if (hx > bx - 2 && hx < bx + bw + 6 && s.b) continue; h.push('<line x1="' + hx + '" x2="' + (hx - 5) + '" y1="' + (base + 1) + '" y2="' + (base + 6) + '"/>'); }
     h.push('</g>'); out.push(h.join(''));
-    return '<svg viewBox="0 0 ' + W + ' ' + H.toFixed(0) + '" role="img" aria-label="' + esc(p.title) + ' — elevation, ' + label(p) + '">' + out.join('') + '</svg>';
+    var y0 = o.shared ? 0 : Math.max(0, Math.floor(top - 34));  // own scale: crop the empty sky above the roof
+    return '<svg viewBox="0 ' + y0 + ' ' + W + ' ' + (H - y0).toFixed(0) + '" role="img" aria-label="' + esc(p.title) + ' — elevation, ' + label(p) + '">' + out.join('') + '</svg>';
   }
 
   /* ---------- open-air venue (tiered seating) ---------- */
