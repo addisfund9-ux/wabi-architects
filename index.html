@@ -79,8 +79,11 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-media">
-      <img src="assets/img/hero-model.jpg" alt="Cityscape architectural model at dusk">
-      <video class="hero-video" autoplay muted loop playsinline preload="auto" poster="assets/img/hero-model.jpg" aria-hidden="true" tabindex="-1">
+      <picture>
+        <source media="(max-aspect-ratio: 4/5)" srcset="assets/img/hero-still-portrait.jpg">
+        <img src="assets/img/hero-still.jpg" alt="Cityscape architectural model of Addis Ababa">
+      </picture>
+      <video class="hero-video" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1">
         <source src="assets/media/hero-loop-portrait.mp4" type="video/mp4" media="(max-aspect-ratio: 4/5)">
         <source src="assets/media/hero-loop.mp4" type="video/mp4">
       </video>
