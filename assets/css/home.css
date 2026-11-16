@@ -607,3 +607,6 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 .hero-sky svg rect{fill:rgba(8,8,10,.28)}
 .hero-sky svg .sl{opacity:.13}
 @media (max-width:760px){.hero-sky{display:none}}
+
+/* drawings in the process strip: show the whole sheet, never crop it */
+.flow-media img.fit{object-fit:contain;background:#0d0f13}
