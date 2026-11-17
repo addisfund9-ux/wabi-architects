@@ -22,6 +22,24 @@ shutil.rmtree(OUT, ignore_errors=True)
 def skip(d, names): return [n for n in names if n in NOT_PUBLISHED] if os.path.abspath(d) == ROOT else []
 shutil.copytree(ROOT, OUT, ignore=skip)
 
+# small (960px) copies of project pictures for cards and lists, made automatically
+# for any project added without them (the page falls back to the full picture otherwise)
+def make_small():
+    import glob
+    try:
+        from PIL import Image
+    except ImportError:
+        print('Pillow not installed: skipping small pictures'); return
+    made = 0
+    for f in glob.glob(os.path.join(OUT, 'assets/img/projects/*/*.jpg')):
+        o = os.path.join(os.path.dirname(f), 'sm', os.path.basename(f))
+        if os.path.exists(o): continue
+        os.makedirs(os.path.dirname(o), exist_ok=True)
+        im = Image.open(f).convert('RGB'); im.thumbnail((960, 960), Image.LANCZOS)
+        im.save(o, 'JPEG', quality=76, optimize=True, progressive=True); made += 1
+    if made: print('Made %d small pictures' % made)
+make_small()
+
 pages = []
 for dp, _, fns in os.walk(OUT):
     for fn in fns:

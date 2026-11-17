@@ -57,7 +57,7 @@
       return '<div class="t-photos' + (imgs.length === 2 ? ' n2' : '') + '">' + imgs.map(function (src, i) {
         var lab = both ? 'Design render' : ((t.captions && t.captions[i]) || 'Photo');
         return '<button type="button" data-src="' + src + '" data-cap="' + esc(lab) + '" aria-label="Open photo: ' + esc(t.title) + ' — ' + esc(lab) + '">' +
-          '<img src="' + src + '" alt="' + esc(t.title) + ' — ' + esc(lab) + '" loading="lazy">' +
+          '<img src="' + window.WABI_SM(src) + '" decoding="async" alt="' + esc(t.title) + ' — ' + esc(lab) + '" loading="lazy">' +
           '<span class="tag' + (/After|Finished/.test(lab) ? ' after' : '') + '">' + esc(lab) + '</span></button>';
       }).join('') + '</div>';
     }

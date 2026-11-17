@@ -229,9 +229,15 @@
     }
     load(0, function () {
       onScroll(); cur = target; draw(cur * (N - 1)); film.classList.add('on');
-      var i = 1; (function next() {            // fetch the rest in order, four at a time
-        for (var k = 0; k < 4 && i < N; k++, i++) load(i, k === 3 || i === N - 1 ? next : null);
-      })();
+      var i = 1, began = false;
+      var rest = function () {                 // the other 40 frames: only once the visitor scrolls,
+        if (began) return; began = true;       // or a few seconds after the page has settled
+        window.removeEventListener('scroll', rest);
+        (function next() { for (var k = 0; k < 4 && i < N; k++, i++) load(i, k === 3 || i === N - 1 ? next : null); })();
+      };
+      window.addEventListener('scroll', rest, { passive: true });
+      var idle = function () { setTimeout(rest, 3500); };
+      if (fine) { if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle); }   // phones: on first scroll only
     });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', function () { H = hero.offsetHeight; });

@@ -66,7 +66,7 @@
   /* ---------- register ---------- */
   function card(p, i) {
     var c = cover(p), media;
-    if (c) media = '<img src="' + c + '" alt="' + esc(p.title) + '" loading="lazy">';
+    if (c) media = '<img src="' + window.WABI_SM(c) + '" decoding="async" alt="' + esc(p.title) + '" loading="lazy">';
     else media = '<div class="pc-sketch">' + S.elevation(p) + '</div>';
     var meta = [p.location, p.year].filter(Boolean).join(' · ');
     return '<a class="pc" href="#' + p.id + '" data-id="' + p.id + '" style="--i:' + i + '">' +
@@ -179,7 +179,7 @@
     var list = items(), t = sheet.querySelector('.ps-thumbs');
     sheet.querySelectorAll('.ps-tabs [data-set]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.set === set); });
     t.innerHTML = list.map(function (it, i) {
-      return '<button type="button" role="listitem" data-i="' + i + '" aria-label="Show picture ' + (i + 1) + (it.caption ? ': ' + esc(it.caption) : '') + '"><img src="' + it.src + '" alt="" loading="lazy"></button>';
+      return '<button type="button" role="listitem" data-i="' + i + '" aria-label="Show picture ' + (i + 1) + (it.caption ? ': ' + esc(it.caption) : '') + '"><img src="' + window.WABI_SM(it.src) + '" decoding="async" alt="" loading="lazy"></button>';
     }).join('');
     t.style.display = list.length > 1 ? '' : 'none';
     sheet.querySelector('.ps-stage').classList.toggle('single', list.length < 2);
