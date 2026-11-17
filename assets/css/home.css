@@ -117,8 +117,9 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:400;line-height:1.02;letter-s
    HERO
    ============================================================ */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;
-  padding:0 var(--pad) clamp(40px,7vh,80px);overflow:hidden}
-.hero-media{position:absolute;inset:0;z-index:-2}
+  padding:0 var(--pad) clamp(40px,7vh,80px);overflow-x:clip;overflow-y:visible}
+.hero-media{position:absolute;inset:0;z-index:-2;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,#000 62%,transparent 100%)}
 .hero-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);
   will-change:transform;animation:kenburns 24s ease-in-out infinite alternate}
 .hero-film{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
@@ -625,7 +626,8 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
    Older browsers get the desktop-only JS fallback in home.js, or a still hero. */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
-    .hero .hero-media,.page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri{animation:px-media linear both}
+    .hero .hero-media{animation:px-media-home linear both;animation-timeline:scroll(root block)!important;animation-range:0 150svh!important}
+    .page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri{animation:px-media linear both}
     .hero h1 .line:nth-child(1),.page-hero h1{animation:px-l1 linear both}
     .hero h1 .line:nth-child(2){animation:px-l2 linear both}
     .hero h1 .line:nth-child(3){animation:px-l3 linear both}
@@ -639,6 +641,7 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
   }
 }
 @keyframes px-media{to{transform:translate3d(0,42svh,0) scale(1.14)}}
+@keyframes px-media-home{60%{opacity:1}to{transform:translate3d(0,92svh,0) scale(1.08);opacity:0}}
 @keyframes px-l1{to{transform:translate3d(0,-6svh,0);opacity:0}}
 @keyframes px-l2{to{transform:translate3d(0,-13svh,0);opacity:0}}
 @keyframes px-l3{to{transform:translate3d(0,-20svh,0);opacity:0}}
@@ -649,8 +652,6 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 /* phones: the film-grain overlay is blended over the moving video on every frame — skip it */
 @media (hover:none){.grain{display:none}}
 /* soft hand-off from the hero into the page instead of a hard edge */
-.hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:22svh;z-index:-1;pointer-events:none;
-  background:linear-gradient(to bottom,rgba(8,8,10,0),var(--bg))}
 
 /* phones and tablets: the hero scrolls as a plain page — no scroll effects on the video
    (moving/scaling a playing video while scrolling stutters on many Android phones),
