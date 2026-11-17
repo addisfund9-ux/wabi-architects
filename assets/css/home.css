@@ -766,5 +766,5 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 @media (max-width:760px){.gal-card{flex-basis:80vw}.gal-media{aspect-ratio:4/3}.gal-more{aspect-ratio:4/3}
   .works .section-head .label{font-size:.6rem;letter-spacing:.2em}}
 .works{padding-bottom:clamp(40px,6vh,80px)}
-@media (max-width:760px){.works .section-head{gap:10px}.works .gal-ctrl .sh-all{font-size:.58rem;letter-spacing:.12em}
+@media (max-width:760px){.works .section-head{gap:10px}.works .gal-ctrl .sh-all{font-size:.56rem;letter-spacing:.06em;padding-bottom:4px}
   .works .section-head h2{font-size:1.6rem}}
