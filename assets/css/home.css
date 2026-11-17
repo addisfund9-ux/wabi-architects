@@ -768,3 +768,30 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 .works{padding-bottom:clamp(40px,6vh,80px)}
 @media (max-width:760px){.works .section-head{gap:10px}.works .gal-ctrl .sh-all{font-size:.56rem;letter-spacing:.06em;padding-bottom:4px}
   .works .section-head h2{font-size:1.6rem}}
+
+/* ---------- atmosphere: the page sits on a faint drafting sheet with warm light,
+   instead of flat black. Two layers behind everything, painted once. ---------- */
+body{isolation:isolate;background:#07080a}
+body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px) 0 0/100% 96px,
+    linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/96px 100%,
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px) 0 0/100% 24px,
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px) 0 0/24px 100%;
+  -webkit-mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,#000 20%,transparent 85%);
+  mask-image:radial-gradient(ellipse 85% 75% at 50% 45%,#000 20%,transparent 85%)}
+body::after{content:"";position:absolute;left:0;right:0;top:0;bottom:0;z-index:-3;pointer-events:none;
+  background:
+    radial-gradient(60vw 50vw at 92% 9%,rgba(201,169,106,.16),transparent 70%),
+    radial-gradient(55vw 45vw at 4% 24%,rgba(70,96,130,.15),transparent 70%),
+    radial-gradient(60vw 50vw at 96% 42%,rgba(201,169,106,.13),transparent 70%),
+    radial-gradient(55vw 45vw at 6% 60%,rgba(70,96,130,.14),transparent 70%),
+    radial-gradient(60vw 50vw at 90% 78%,rgba(201,169,106,.13),transparent 70%),
+    radial-gradient(70vw 50vw at 30% 97%,rgba(201,169,106,.12),transparent 70%)}
+/* tinted bands become glass, so the light shows through them */
+.montage,.approach,.spec-sec{background:linear-gradient(180deg,rgba(18,20,26,.35),rgba(18,20,26,.62) 18%,rgba(18,20,26,.62) 82%,rgba(18,20,26,.35))}
+.flow{background:transparent}
+/* soft hairlines instead of hard cuts between sections */
+.montage,.approach,.flow,.spec-sec{border-top:0}
+.montage::before,.approach::before,.flow::before,.spec-sec::before{content:"";position:absolute;left:var(--pad);right:var(--pad);top:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,169,106,.28),transparent)}
