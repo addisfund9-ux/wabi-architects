@@ -8,3 +8,9 @@ document.addEventListener('error', function (e) {
   var t = e.target;
   if (t && t.tagName === 'IMG' && /\/sm\//.test(t.src) && !t.dataset.full) { t.dataset.full = 1; t.src = t.src.replace('/sm/', '/'); }
 }, true);
+/* web fonts load alongside the page instead of holding it up (text shows at once, then swaps) */
+(function () {
+  var l = document.createElement('link'); l.rel = 'stylesheet';
+  l.href = 'https://fonts.googleapis.com/css2?family=Marcellus&family=Outfit:wght@200;300;400;500&display=swap';
+  document.head.appendChild(l);
+})();
