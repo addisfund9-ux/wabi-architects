@@ -676,3 +676,27 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
   .hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:26svh;z-index:-1;pointer-events:none;
     background:linear-gradient(to bottom,rgba(8,8,10,0),var(--bg))}
 }
+
+/* services ribbon — a single fine line, not a banner */
+.marquee{background:none;border-top:1px solid var(--line-soft,rgba(255,255,255,.06));border-bottom:1px solid var(--line-soft,rgba(255,255,255,.06));
+  margin:0 var(--pad);-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.marquee::before,.marquee::after{display:none}
+.marquee-track{padding:15px 0;animation-duration:48s}
+.marquee span{font-family:var(--mono);font-size:.7rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--muted);padding:0 26px}
+.marquee span.dot{color:var(--accent);font-size:.8rem;letter-spacing:0}
+.marquee:hover span:not(.dot){color:var(--muted)}
+.marquee span:not(.dot):hover{color:var(--text)}
+
+/* "Selected works" heading — one compact line with a link to all projects */
+.works{padding-top:clamp(56px,8vh,100px)}
+.works .section-head{max-width:none;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+  margin-bottom:clamp(30px,4vw,52px);padding-bottom:18px;border-bottom:1px solid var(--line)}
+.works .section-head .label{margin-bottom:12px}
+.works .section-head h2{font-size:clamp(1.6rem,3vw,2.4rem);line-height:1.1}
+.works .section-head .sh-all{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;padding-bottom:6px;transition:color .3s}
+.works .section-head .sh-all:hover{color:var(--accent)}
+@media (max-width:620px){.works .section-head{align-items:flex-end;gap:12px}.works .section-head .sh-all{font-size:.62rem;letter-spacing:.14em}}
+.works .section-head + .work{margin-top:0;padding-top:0}
