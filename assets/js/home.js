@@ -146,6 +146,47 @@
     io.observe(gal);
   })();
 
+  /* ---------- atmosphere: stars + drawings that take over from the grid as you scroll ----------
+     Every layer is a fixed, full-screen picture whose opacity follows how far down the page you
+     are, so the work is only cross-fading (cheap on any phone). Pictures load after the page. */
+  (function () {
+    var root = document.createElement('div'); root.className = 'atmo'; root.setAttribute('aria-hidden', 'true');
+    var defs = [   // [class, picture, fade in from, full from, full until, fade out by, max opacity]
+      ['stars', 'stars-a.svg', -1, 0, 1, 2, .55],
+      ['stars2', 'stars-b.svg', -1, 0, 1, 2, 1],
+      ['d-site', 'site.svg', .06, .16, .30, .40, .16],
+      ['d-a', 'plan-a.webp', .32, .42, .50, .60, .13],
+      ['d-b', 'plan-b.webp', .52, .62, .70, .80, .13],
+      ['d-s', 'section.webp', .72, .84, 1, 2, .14]
+    ];
+    var layers = defs.map(function (d) { var el = document.createElement('i'); el.className = d[0]; root.appendChild(el); return el; });
+    document.body.insertBefore(root, document.body.firstChild);
+    var base = 'assets/img/atmo/', loaded = false;
+    function loadAll() {
+      if (loaded) return; loaded = true;
+      defs.forEach(function (d, k) { layers[k].style.backgroundImage = 'url(' + base + d[1] + ')'; });
+    }
+    if (document.readyState === 'complete') setTimeout(loadAll, 600); else window.addEventListener('load', function () { setTimeout(loadAll, 600); });
+    var gridEl = document.documentElement, q = false, max = 1;
+    function measure() { max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
+    function amt(p, a, b, c, d) { return p < a || p > d ? 0 : p < b ? (p - a) / (b - a) : p <= c ? 1 : 1 - (p - c) / (d - c); }
+    function paint() {
+      q = false;
+      var p = Math.min(1, window.pageYOffset / max);
+      defs.forEach(function (d, k) {
+        if (k < 2) return;
+        var v = amt(p, d[2], d[3], d[4], d[5]);
+        layers[k].style.opacity = (v * d[6]).toFixed(3);
+        layers[k].style.transform = 'scale(' + (1.06 - v * .06).toFixed(3) + ') rotate(' + ((1 - v) * (k % 2 ? -2 : 2)).toFixed(2) + 'deg)';
+      });
+      gridEl.style.setProperty('--grid', Math.max(.2, 1 - p * 4).toFixed(3));   // the grid gives way to the drawings
+    }
+    window.addEventListener('scroll', function () { if (!q) { q = true; requestAnimationFrame(paint); } }, { passive: true });
+    window.addEventListener('resize', function () { measure(); paint(); });
+    window.addEventListener('load', function () { measure(); paint(); });
+    measure(); paint();
+  })();
+
   /* ---------- word-by-word text (studio line) ---------- */
   (function () {
     [].forEach.call(document.querySelectorAll('.words'), function (el) {

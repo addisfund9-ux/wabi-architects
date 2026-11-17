@@ -772,7 +772,7 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 /* ---------- atmosphere: the page sits on a faint drafting sheet with warm light,
    instead of flat black. Two layers behind everything, painted once. ---------- */
 body{isolation:isolate;background:#07080a}
-body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:var(--grid,1);
   background:
     linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px) 0 0/100% 96px,
     linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/96px 100%,
@@ -795,3 +795,18 @@ body::after{content:"";position:absolute;left:0;right:0;top:0;bottom:0;z-index:-
 .montage,.approach,.flow,.spec-sec{border-top:0}
 .montage::before,.approach::before,.flow::before,.spec-sec::before{content:"";position:absolute;left:var(--pad);right:var(--pad);top:0;height:1px;
   background:linear-gradient(90deg,transparent,rgba(201,169,106,.28),transparent)}
+
+/* ---------- night sky + drawings: as you scroll down the page the drafting grid fades and the
+   background turns into a site plan, then floor plans, then a building section (home.js) ---------- */
+.atmo{position:fixed;inset:0;z-index:-3;pointer-events:none;overflow:hidden}
+.atmo i{position:absolute;inset:-4%;opacity:0;will-change:opacity,transform;background:no-repeat center/contain;
+  -webkit-mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 25%,transparent 78%);
+  mask-image:radial-gradient(ellipse 70% 65% at 50% 50%,#000 25%,transparent 78%)}
+.atmo .stars,.atmo .stars2{inset:0;opacity:.55;background-size:700px 700px;background-repeat:repeat;
+  -webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.35) 70%,#000);mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.35) 70%,#000)}
+.atmo .stars2{background-size:520px 520px;animation:twinkle 7s ease-in-out infinite alternate}
+@keyframes twinkle{from{opacity:.15}to{opacity:.6}}
+.atmo .d-site{background-size:min(1500px,120vw) auto}
+.atmo .d-a,.atmo .d-b,.atmo .d-s{background-size:auto min(86vh,1100px)}
+@media (max-width:760px){.atmo .d-a,.atmo .d-b,.atmo .d-s{background-size:120vw auto}.atmo .d-site{background-size:200vw auto}}
+@media (prefers-reduced-motion:reduce){.atmo .stars2{animation:none}}
