@@ -671,3 +671,8 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
   .ft-img.fit{object-fit:contain;background:#0d0f13}
   .ft-step.on .ft-img,.ft-step.done .ft-img{opacity:1}
 }
+/* phones (no scroll effects): soft hand-off from the hero into the page */
+@media (hover:none),(pointer:coarse){
+  .hero::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:26svh;z-index:-1;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(8,8,10,0),var(--bg))}
+}
