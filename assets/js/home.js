@@ -113,6 +113,32 @@
     check(); // reveal whatever is already in view
   })();
 
+  /* ---------- word-by-word text (studio line) ---------- */
+  (function () {
+    [].forEach.call(document.querySelectorAll('.words'), function (el) {
+      var i = 0;
+      (function split(node) {
+        [].slice.call(node.childNodes).forEach(function (n) {
+          if (n.nodeType === 3) {
+            var frag = document.createDocumentFragment();
+            n.textContent.split(/(\s+)/).forEach(function (part) {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+              var w = document.createElement('span'), inner = document.createElement('span');
+              w.className = 'w'; inner.textContent = part; inner.style.setProperty('--i', i++);
+              w.appendChild(inner); frag.appendChild(w);
+            });
+            n.parentNode.replaceChild(frag, n);
+          } else if (n.nodeType === 1) split(n);
+        });
+      })(el);
+      var go = function () { el.classList.add('in'); setTimeout(function () { el.classList.add('lit'); }, i * 70 + 700); };
+      if (!('IntersectionObserver' in window)) return go();
+      var io = new IntersectionObserver(function (e) { if (e[0].isIntersecting) { go(); io.disconnect(); } }, { threshold: .35 });
+      io.observe(el);
+    });
+  })();
+
   /* ---------- HERO film: the city model goes from day to night as you scroll ----------
      Scroll down = forward, scroll up = back; it never plays on its own. The film is 41
      stills stacked on top of each other; scrolling only changes which two are visible and
