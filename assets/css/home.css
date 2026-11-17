@@ -710,3 +710,61 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 .js .words.in.lit .mut .w > span{color:var(--muted);transition-delay:calc(var(--i) * 70ms + 200ms)}
 .reveal-all .words .w > span{transform:none;opacity:1}
 @media (prefers-reduced-motion:reduce){.js .words .w > span{transform:none;opacity:1;transition:none}}
+
+/* ---------- Recent projects: a compact, swipeable gallery ---------- */
+.works .gal-ctrl{display:flex;align-items:center;gap:10px}
+.gal-btn{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--text);
+  font-size:1rem;cursor:pointer;transition:border-color .3s,background .3s,opacity .3s}
+.gal-btn:hover{border-color:var(--accent);background:rgba(201,169,106,.08)}
+.gal-btn[disabled]{opacity:.3;cursor:default}
+.works .gal-ctrl .sh-all{margin-left:14px}
+.gal{position:relative;margin:0 calc(var(--pad) * -1)}
+.gal-rail{display:flex;gap:clamp(14px,1.6vw,24px);overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;
+  padding:0 var(--pad) 6px;scroll-padding:0 var(--pad);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.gal-rail::-webkit-scrollbar{display:none}
+.gal-card{flex:0 0 clamp(250px,26vw,400px);scroll-snap-align:start;display:flex;flex-direction:column;color:inherit;
+  border:0;padding:0;grid-template-columns:none}
+.gal-media{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:4px;background:var(--bg-2)}
+.gal-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 1.1s var(--ease),filter .6s}
+.gal-card:hover .gal-media img{transform:scale(1.1)}
+.gal-media::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,10,.55),transparent 45%);pointer-events:none}
+.gal-body{padding:16px 2px 0}
+.gal-n{font-family:var(--mono);font-size:.68rem;color:var(--accent);letter-spacing:.14em;margin-right:12px}
+.gal-cat{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.gal-card h3{font-family:var(--display);font-size:clamp(1.25rem,1.7vw,1.6rem);font-weight:400;line-height:1.2;margin:8px 0 6px}
+.gal-card p{color:var(--muted);font-size:.9rem;line-height:1.5;max-width:34ch}
+.gal-yr{font-family:var(--mono);font-size:.7rem;color:var(--muted-2);margin-left:4px}
+.gal-more{justify-content:flex-end;gap:12px;padding:28px;border:1px solid var(--line);border-radius:4px;aspect-ratio:4/5;
+  align-self:flex-start;transition:border-color .4s,background .4s}
+.gal-more:hover{border-color:var(--accent);background:rgba(201,169,106,.05)}
+.gal-more-t{font-family:var(--display);font-size:clamp(1.6rem,2.4vw,2.2rem)}
+.gal-more-n{color:var(--muted);font-size:.9rem}
+.gal-bar{height:1px;background:var(--line);margin:clamp(22px,3vw,36px) var(--pad) 0;position:relative;overflow:hidden}
+.gal-bar span{position:absolute;left:0;top:0;bottom:0;width:20%;background:var(--accent);transform-origin:left;transition:transform .2s linear}
+/* cards rise in one after another */
+.js .gal-card{opacity:0;transform:translateY(40px);transition:opacity .9s var(--ease),transform .9s var(--ease);
+  transition-delay:calc(var(--i) * 90ms)}
+.js .gal.in .gal-card{opacity:1;transform:none}
+.reveal-all .gal-card{opacity:1;transform:none}
+@media (max-width:760px){
+  .gal-card{flex-basis:76vw}
+  .gal-btn{display:none}
+  .works .gal-ctrl .sh-all{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){.js .gal-card{opacity:1;transform:none;transition:none}}
+/* compact cards: landscape pictures, caption on the picture */
+.gal-card{position:relative;flex-basis:clamp(280px,30vw,480px)}
+.gal-media{aspect-ratio:3/2}
+.gal-media::after{background:linear-gradient(to top,rgba(8,8,10,.85),rgba(8,8,10,.25) 45%,transparent 70%)}
+.gal-body{position:absolute;left:0;right:0;bottom:0;padding:18px 20px;z-index:1}
+.gal-card h3{margin:6px 0 0;font-size:clamp(1.15rem,1.5vw,1.45rem)}
+.gal-card p{max-height:0;opacity:0;overflow:hidden;margin-top:0;font-size:.86rem;color:#cfccc3;
+  transition:max-height .5s var(--ease),opacity .4s,margin .4s}
+.gal-card:hover p,.gal-card:focus-visible p{max-height:4em;opacity:1;margin-top:6px}
+.gal-more{aspect-ratio:3/2;padding:22px}
+.works .section-head .label{white-space:nowrap}
+@media (max-width:760px){.gal-card{flex-basis:80vw}.gal-media{aspect-ratio:4/3}.gal-more{aspect-ratio:4/3}
+  .works .section-head .label{font-size:.6rem;letter-spacing:.2em}}
+.works{padding-bottom:clamp(40px,6vh,80px)}
+@media (max-width:760px){.works .section-head{gap:10px}.works .gal-ctrl .sh-all{font-size:.58rem;letter-spacing:.12em}
+  .works .section-head h2{font-size:1.6rem}}

@@ -113,6 +113,39 @@
     check(); // reveal whatever is already in view
   })();
 
+  /* ---------- Recent projects gallery: arrows, progress line, drag on desktop ---------- */
+  (function () {
+    var gal = document.querySelector('.gal'); if (!gal) return;
+    var rail = gal.querySelector('.gal-rail'), bar = gal.querySelector('.gal-bar span');
+    var btns = [].slice.call(document.querySelectorAll('.gal-btn'));
+    var n = document.querySelector('[data-total="projects"]');
+    if (n && window.WABI_PROJECTS) n.textContent = window.WABI_PROJECTS.length + ' projects · design & finishing';
+    function step() { var c = rail.querySelector('.gal-card'); return c ? c.getBoundingClientRect().width + 20 : 300; }
+    btns.forEach(function (b) { b.addEventListener('click', function () { rail.scrollBy({ left: step() * +b.dataset.dir, behavior: reduce ? 'auto' : 'smooth' }); }); });
+    var q = false;
+    function sync() {
+      q = false;
+      var max = rail.scrollWidth - rail.clientWidth, x = rail.scrollLeft, vis = rail.clientWidth / rail.scrollWidth;
+      if (bar) { bar.style.width = (vis * 100).toFixed(1) + '%'; bar.style.transform = 'translateX(' + (max > 0 ? x / max * (1 / vis - 1) * 100 : 0).toFixed(1) + '%)'; }
+      if (btns[0]) btns[0].disabled = x < 4;
+      if (btns[1]) btns[1].disabled = x > max - 4;
+    }
+    rail.addEventListener('scroll', function () { if (!q) { q = true; requestAnimationFrame(sync); } }, { passive: true });
+    window.addEventListener('resize', sync); sync();
+    if (fine) {   // click-and-drag with the mouse
+      var down = false, sx = 0, sl = 0, moved = false;
+      rail.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; down = true; moved = false; sx = e.clientX; sl = rail.scrollLeft; rail.style.scrollSnapType = 'none'; });
+      window.addEventListener('pointermove', function (e) { if (!down) return; var d = e.clientX - sx; if (Math.abs(d) > 5) moved = true; rail.scrollLeft = sl - d; });
+      window.addEventListener('pointerup', function () { if (!down) return; down = false; rail.style.scrollSnapType = ''; });
+      rail.addEventListener('click', function (e) { if (moved) { e.preventDefault(); e.stopPropagation(); } }, true);
+      rail.addEventListener('dragstart', function (e) { e.preventDefault(); });
+    }
+    var go = function () { gal.classList.add('in'); };
+    if (!('IntersectionObserver' in window)) return go();
+    var io = new IntersectionObserver(function (e) { if (e[0].isIntersecting) { go(); io.disconnect(); } }, { threshold: .2 });
+    io.observe(gal);
+  })();
+
   /* ---------- word-by-word text (studio line) ---------- */
   (function () {
     [].forEach.call(document.querySelectorAll('.words'), function (el) {

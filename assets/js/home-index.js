@@ -2,7 +2,7 @@
    Both come from assets/js/projects-data.js — add a project there and it shows up here. */
 (function () {
   var P = window.WABI_PROJECTS || [], S = window.WABI && window.WABI.sketch;
-  var featured = [].map.call(document.querySelectorAll('a.work[href*="#"]'), function (a) { return a.getAttribute('href').split('#')[1]; });
+  var featured = [].map.call(document.querySelectorAll('a.gal-card[href*="#"]'), function (a) { return a.getAttribute('href').split('#')[1]; });
   var list = P.filter(function (p) { return featured.indexOf(p.id) < 0 && (p.images || []).length && (p.work || []).indexOf('design') > -1; }).slice(0, 6);
   var box = document.getElementById('worksIndex');
   if (box && list.length) {
