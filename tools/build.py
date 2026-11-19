@@ -46,6 +46,8 @@ for dp, _, fns in os.walk(OUT):
     for fn in fns:
         if not fn.endswith('.html'): continue
         fp = os.path.join(dp, fn); s = open(fp, encoding='utf-8').read()
+        # cache-busting: each publish gets fresh scripts and styles, never a stale mix of old and new
+        s = re.sub(r'((?:src|href)="assets/(?:js|css)/[A-Za-z0-9_.-]+\.(?:js|css))"', r'\1?v=' + SHA[:8] + '"', s)
         s = s.replace(OLD_DOMAIN + '/', URL + '/').replace(OLD_DOMAIN, URL)
         if fn == '404.html':  # works from any missing address, however deep
             s = s.replace('<meta charset="UTF-8">', '<meta charset="UTF-8">\n<base href="' + base_path + '/">', 1)
