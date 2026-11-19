@@ -9,7 +9,7 @@
     var fin = box.innerHTML;
     box.innerHTML = list.map(function (p, i) {
       var cat = [p.type, p.location && p.location.indexOf('Addis') < 0 ? p.location : '', p.year].filter(Boolean).join(' · ');
-      return '<a class="wi-row" href="projects.html#' + p.id + '" data-img="' + window.WABI_SM(p.cover || p.images[0]) + '">' +
+      return '<a class="wi-row" href="projects.html#' + p.id + '" data-img="' + window.WABI_XS(p.cover || p.images[0]) + '">' +
         '<span class="wi-l"><span class="wi-num">' + ('0' + (i + 1 + featured.length)).slice(-2) + '</span><h4>' + S.esc(p.title) + '</h4></span>' +
         '<span class="wi-cat">' + S.esc(cat) + '</span></a>';
     }).join('') + fin.replace(/<span class="wi-num">\d+<\/span>/, '<span class="wi-num">' + ('0' + (list.length + 1 + featured.length)).slice(-2) + '</span>');

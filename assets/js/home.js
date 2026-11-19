@@ -154,9 +154,8 @@
     var defs = [   // [class, picture, fade in from, full from, full until, fade out by, max opacity]
       ['stars', 'stars-a.svg', -1, 0, 1, 2, .55],
       ['stars2', 'stars-b.svg', -1, 0, 1, 2, 1],
-      ['d-site', 'site.svg', .06, .16, .30, .40, .16],
-      ['d-a', 'plan-a.webp', .32, .42, .50, .60, .13],
-      ['d-b', 'plan-b.webp', .52, .62, .70, .80, .13],
+      ['d-a', 'plan-a.webp', .10, .22, .40, .52, .13],
+      ['d-b', 'plan-b.webp', .46, .58, .70, .80, .13],
       ['d-s', 'section.webp', .72, .84, 1, 2, .14]
     ];
     var layers = defs.map(function (d) { var el = document.createElement('i'); el.className = d[0]; root.appendChild(el); return el; });
@@ -214,71 +213,73 @@
   })();
 
   /* ---------- HERO film: the city model goes from day to night as you scroll ----------
-     Scroll down = forward, scroll up = back; it never plays on its own. The film is 41
-     stills stacked on top of each other; scrolling only changes which two are visible and
-     how far the upper one has faded in. That is pure compositing, so it stays in step with
-     the scroll on every phone (seeking a real <video> stutters on Android).
+     Scroll down = forward, scroll up = back; it never plays on its own. 61 stills are
+     decoded off the main thread (ImageBitmap) and drawn on a canvas, blending the two
+     nearest frames, with an eased follow so the motion glides instead of stepping.
+     Only frames near the current position are kept decoded, to spare memory on phones.
      Reduced-motion and data-saver visitors keep the daytime still. */
   (function () {
-    var film = document.querySelector('.hero-film'), hero = document.querySelector('.hero');
-    if (!film || !hero) return;
+    var cv = document.querySelector('.hero-film'), hero = document.querySelector('.hero');
+    if (!cv || !hero) return;
     var save = navigator.connection && navigator.connection.saveData;
-    if (reduce || save) { film.remove(); return; }
-    var N = 41, set = (window.innerWidth / window.innerHeight < 0.8) ? 'p' : 'l';
-    var base = 'assets/media/hero-seq/' + set + '/';
-    var frames = new Array(N), ok = new Array(N), dec = new Array(N);
-    var target = 0, cur = 0, raf = 0, H = hero.offsetHeight, shownA = -1, shownB = -1, lastT = -1;
-    film.parentNode.classList.add('has-video');
-    for (var n = 0; n < N; n++) { var im = document.createElement('img'); im.alt = ''; im.decoding = 'async'; frames[n] = im; film.appendChild(im); }
+    if (reduce || save || !cv.getContext) { cv.remove(); return; }
+    var N = 61, set = (window.innerWidth / window.innerHeight < 0.8) ? 'p' : 'l';
+    var base = 'assets/media/hero-seq/' + set + '/', ctx = cv.getContext('2d', { alpha: false });
+    var raw = new Array(N), bmp = {}, pend = {}, canBmp = !!window.createImageBitmap;
+    var target = 0, cur = 0, raf = 0, H = hero.offsetHeight, lastKey = -1, sized = false;
+    cv.parentNode.classList.add('has-video');
 
     function pad(i) { return (i < 10 ? '0' : '') + i; }
     function load(i, done) {
-      var im = frames[i];
-      im.onload = function () { ok[i] = true; if (done) done(); if (Math.abs(i - cur * (N - 1)) < 3 && !raf) { lastT = -1; raf = requestAnimationFrame(tick); } };
+      var im = new Image(); im.decoding = 'async';
+      im.onload = function () { raw[i] = im; if (!sized) { cv.width = im.naturalWidth; cv.height = im.naturalHeight; sized = true; } if (done) done(); kick(); };
       im.onerror = function () { if (done) done(); };
       im.src = base + pad(i) + '.webp';
     }
-    function warm(i) {   // decode a frame before it is needed, off the main thread
-      if (i < 0 || i >= N || !ok[i] || dec[i]) return;
-      dec[i] = true; if (frames[i].decode) frames[i].decode().catch(function () {});
+    function want(i) {
+      if (i < 0 || i >= N || !raw[i] || bmp[i] || pend[i]) return;
+      if (!canBmp) { bmp[i] = raw[i]; return; }
+      pend[i] = true;
+      createImageBitmap(raw[i]).then(function (b) { pend[i] = false; bmp[i] = b; lastKey = -1; kick(); },
+        function () { pend[i] = false; bmp[i] = raw[i]; });
     }
-    function have(i) { while (i > 0 && !ok[i]) i--; return ok[i] ? i : -1; }
-    function hide(i) { if (i >= 0) frames[i].style.visibility = 'hidden'; }
+    function near(i) { for (var d = 0; d < N; d++) { if (bmp[i - d]) return i - d; if (bmp[i + d]) return i + d; } return -1; }
     function draw(f) {
-      var c = Math.floor(f); for (var k = -2; k <= 4; k++) warm(c + k);
-      var a = have(c); if (a < 0) return;
-      var b = (a === c && a + 1 < N && ok[a + 1]) ? a + 1 : -1;
-      var t = b < 0 ? 0 : Math.round((f - a) * 20) / 20;
-      if (a === shownA && b === shownB && t === lastT) return;
-      if (shownA !== a && shownA !== b) hide(shownA);
-      if (shownB !== a && shownB !== b) hide(shownB);
-      frames[a].style.opacity = 1; frames[a].style.visibility = 'visible';
-      if (b >= 0) { frames[b].style.opacity = t; frames[b].style.visibility = t > 0 ? 'visible' : 'hidden'; }
-      shownA = a; shownB = b; lastT = t;
+      var c = Math.floor(f);
+      for (var k = -3; k <= 6; k++) want(c + k);
+      for (var key in bmp) if ((key < c - 8 || key > c + 10) && +key !== 0) { if (bmp[key].close) bmp[key].close(); delete bmp[key]; }
+      var a = bmp[c] ? c : near(c); if (a < 0) return false;
+      var t = (a === c && bmp[c + 1]) ? f - c : 0;
+      var k2 = Math.round(f * 200); if (k2 === lastKey) return true; lastKey = k2;
+      ctx.globalAlpha = 1; ctx.drawImage(bmp[a], 0, 0, cv.width, cv.height);
+      if (t > .01) { ctx.globalAlpha = t; ctx.drawImage(bmp[c + 1], 0, 0, cv.width, cv.height); ctx.globalAlpha = 1; }
+      return true;
     }
     function tick() {
       raf = 0;
-      cur += (target - cur) * .22;
-      if (Math.abs(target - cur) < .0005) cur = target;
-      draw(cur * (N - 1));
+      var d = target - cur;
+      cur = Math.abs(d) < .0004 ? target : cur + d * .12;   // eased follow: glides to the scroll position
+      var ok = draw(cur * (N - 1));
+      if (ok && !cv.classList.contains('on')) cv.classList.add('on');
       if (cur !== target) raf = requestAnimationFrame(tick);
     }
+    function kick() { if (!raf) raf = requestAnimationFrame(tick); }
     function onScroll() {
-      var y = window.pageYOffset; if (y > H * 1.05 && target === 1 && cur === 1) return;
-      target = Math.min(1, Math.max(0, y / (H * (fine ? .8 : .55))));
-      if (!raf) raf = requestAnimationFrame(tick);
+      var y = window.pageYOffset; if (y > H * 1.4 && target === 1 && cur === 1) return;
+      target = Math.min(1, Math.max(0, y / (H * (fine ? 1 : .7))));
+      kick();
     }
     load(0, function () {
-      onScroll(); cur = target; draw(cur * (N - 1)); film.classList.add('on');
+      onScroll(); cur = target; lastKey = -1; want(0);
       var i = 1, began = false;
-      var rest = function () {                 // the other 40 frames: only once the visitor scrolls,
-        if (began) return; began = true;       // or a few seconds after the page has settled
+      var rest = function () {                 // the other frames: once the visitor scrolls,
+        if (began) return; began = true;       // or (desktop) a few seconds after the page has settled
         window.removeEventListener('scroll', rest);
         (function next() { for (var k = 0; k < 4 && i < N; k++, i++) load(i, k === 3 || i === N - 1 ? next : null); })();
       };
       window.addEventListener('scroll', rest, { passive: true });
-      var idle = function () { setTimeout(rest, 3500); };
-      if (fine) { if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle); }   // phones: on first scroll only
+      var idle = function () { setTimeout(rest, 2500); };
+      if (fine) { if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle); }
     });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', function () { H = hero.offsetHeight; });
@@ -386,7 +387,9 @@
     function load(src) {
       if (!cache[src]) cache[src] = new Promise(function (ok) {
         var i = new Image(); i.decoding = 'async';
-        i.onload = i.onerror = function () { ok(src); }; i.src = src;
+        i.onload = function () { ok(src); };
+        i.onerror = function () { var n = src.indexOf('/xs/') > -1 ? src.replace('/xs/', '/sm/') : src.replace('/sm/', '/'); if (n === src) return ok(src); src = n; i.src = n; };
+        i.src = src;
       });
       return cache[src];
     }
@@ -414,10 +417,15 @@
         if (!on) { px = tx; py = ty; }                              // appear where the pointer is
         var r = preview.getBoundingClientRect(); W = r.width || W; H = r.height || H;
         on = true; cur = row.dataset.img; place();
-        load(cur).then(function (src) {
-          if (src !== cur || !on) return;
-          img.src = src; preview.classList.add('show');
-        });
+        preview.classList.add('show');
+        if (img.getAttribute('src') !== cur) {
+          preview.classList.add('loading'); img.style.opacity = 0;
+          load(cur).then(function (src) {
+            if (src !== cur || !on) return;
+            img.onload = function () { img.style.opacity = 1; preview.classList.remove('loading'); };
+            img.src = src; if (img.complete && img.naturalWidth) img.onload();
+          });
+        }
         if (!raf) raf = requestAnimationFrame(loop);
       });
       row.addEventListener('mouseleave', function () { on = false; cur = null; preview.classList.remove('show'); });

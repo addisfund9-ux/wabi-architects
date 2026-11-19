@@ -32,11 +32,12 @@ def make_small():
         print('Pillow not installed: skipping small pictures'); return
     made = 0
     for f in glob.glob(os.path.join(OUT, 'assets/img/projects/*/*.jpg')):
-        o = os.path.join(os.path.dirname(f), 'sm', os.path.basename(f))
-        if os.path.exists(o): continue
-        os.makedirs(os.path.dirname(o), exist_ok=True)
-        im = Image.open(f).convert('RGB'); im.thumbnail((960, 960), Image.LANCZOS)
-        im.save(o, 'JPEG', quality=76, optimize=True, progressive=True); made += 1
+        for sub, side, q in (('sm', 960, 76), ('xs', 480, 66)):   # small: cards; extra-small: hover previews
+            o = os.path.join(os.path.dirname(f), sub, os.path.basename(f))
+            if os.path.exists(o): continue
+            os.makedirs(os.path.dirname(o), exist_ok=True)
+            im = Image.open(f).convert('RGB'); im.thumbnail((side, side), Image.LANCZOS)
+            im.save(o, 'JPEG', quality=q, optimize=True, progressive=True); made += 1
     if made: print('Made %d small pictures' % made)
 make_small()
 

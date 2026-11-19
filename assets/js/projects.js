@@ -179,7 +179,7 @@
     var list = items(), t = sheet.querySelector('.ps-thumbs');
     sheet.querySelectorAll('.ps-tabs [data-set]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.set === set); });
     t.innerHTML = list.map(function (it, i) {
-      return '<button type="button" role="listitem" data-i="' + i + '" aria-label="Show picture ' + (i + 1) + (it.caption ? ': ' + esc(it.caption) : '') + '"><img src="' + window.WABI_SM(it.src) + '" decoding="async" alt="" loading="lazy"></button>';
+      return '<button type="button" role="listitem" data-i="' + i + '" aria-label="Show picture ' + (i + 1) + (it.caption ? ': ' + esc(it.caption) : '') + '"><img src="' + window.WABI_XS(it.src) + '" decoding="async" alt="" loading="lazy"></button>';
     }).join('');
     t.style.display = list.length > 1 ? '' : 'none';
     sheet.querySelector('.ps-stage').classList.toggle('single', list.length < 2);

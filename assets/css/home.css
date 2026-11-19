@@ -122,7 +122,7 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:400;line-height:1.02;letter-s
   -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,#000 62%,transparent 100%)}
 .hero-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);
   will-change:transform;animation:kenburns 24s ease-in-out infinite alternate}
-.hero-film{position:absolute;inset:0;opacity:0;transition:opacity .5s ease}
+.hero-film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease}
 .hero-film.on{opacity:1}
 .hero-media .hero-film img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;visibility:hidden;
   transform:none!important;animation:none!important}
@@ -806,7 +806,18 @@ body::after{content:"";position:absolute;left:0;right:0;top:0;bottom:0;z-index:-
   -webkit-mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.35) 70%,#000);mask-image:linear-gradient(180deg,#000,rgba(0,0,0,.35) 70%,#000)}
 .atmo .stars2{background-size:520px 520px;animation:twinkle 7s ease-in-out infinite alternate}
 @keyframes twinkle{from{opacity:.15}to{opacity:.6}}
-.atmo .d-site{background-size:min(1500px,120vw) auto}
 .atmo .d-a,.atmo .d-b,.atmo .d-s{background-size:auto min(86vh,1100px)}
-@media (max-width:760px){.atmo .d-a,.atmo .d-b,.atmo .d-s{background-size:120vw auto}.atmo .d-site{background-size:200vw auto}}
+@media (max-width:760px){.atmo .d-a,.atmo .d-b,.atmo .d-s{background-size:120vw auto}}
 @media (prefers-reduced-motion:reduce){.atmo .stars2{animation:none}}
+
+/* portfolio preview: shows at once; a soft shimmer until the picture arrives */
+.wi-preview{background:#15171c}
+.wi-preview img{transition:opacity .35s ease,transform .6s var(--ease)}
+.wi-preview.loading::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 30%,rgba(201,169,106,.10) 50%,transparent 70%) 0 0/250% 100%;animation:shim 1.2s linear infinite}
+@keyframes shim{from{background-position:120% 0}to{background-position:-120% 0}}
+
+/* inner page covers: the picture fades out at the bottom into the page background */
+.page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri{
+  -webkit-mask-image:linear-gradient(to bottom,#000 50%,rgba(0,0,0,.6) 75%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 50%,rgba(0,0,0,.6) 75%,transparent 100%)}
