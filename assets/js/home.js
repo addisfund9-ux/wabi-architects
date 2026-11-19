@@ -212,73 +212,7 @@
     });
   })();
 
-  /* ---------- HERO film: the city model goes from day to night as you scroll ----------
-     Scroll down = forward, scroll up = back; it never plays on its own. 61 stills are
-     decoded off the main thread (ImageBitmap) and drawn on a canvas, blending the two
-     nearest frames, with an eased follow so the motion glides instead of stepping.
-     Only frames near the current position are kept decoded, to spare memory on phones.
-     Reduced-motion and data-saver visitors keep the daytime still. */
-  (function () {
-    var cv = document.querySelector('.hero-film'), hero = document.querySelector('.hero');
-    if (!cv || !hero) return;
-    var save = navigator.connection && navigator.connection.saveData;
-    if (reduce || save || !cv.getContext) { cv.remove(); return; }
-    var N = 61, set = (window.innerWidth / window.innerHeight < 0.8) ? 'p' : 'l';
-    var base = 'assets/media/hero-seq/' + set + '/', ctx = cv.getContext('2d', { alpha: false });
-    var raw = new Array(N), bmp = {}, pend = {}, canBmp = !!window.createImageBitmap;
-    var target = 0, cur = 0, raf = 0, H = hero.offsetHeight, lastKey = -1, sized = false;
-    cv.parentNode.classList.add('has-video');
-
-    function pad(i) { return (i < 10 ? '0' : '') + i; }
-    var pre = window.__film && window.__film.set === set ? window.__film.imgs : null;   // already requested in <head>
-    function load(i, done) {
-      var im = (pre && pre[i]) || new Image();
-      function ok() { raw[i] = im; if (!sized) { cv.width = im.naturalWidth; cv.height = im.naturalHeight; sized = true; } if (done) done(); kick(); }
-      function bad() { if (done) done(); }
-      if (im.complete && im.src) { if (im.naturalWidth) ok(); else bad(); return; }
-      im.decoding = 'async'; im.onload = ok; im.onerror = bad;
-      if (!im.src) im.src = base + pad(i) + '.webp';
-    }
-    function want(i) {
-      if (i < 0 || i >= N || !raw[i] || bmp[i] || pend[i]) return;
-      if (!canBmp) { bmp[i] = raw[i]; return; }
-      pend[i] = true;
-      createImageBitmap(raw[i]).then(function (b) { pend[i] = false; bmp[i] = b; lastKey = -1; kick(); },
-        function () { pend[i] = false; bmp[i] = raw[i]; });
-    }
-    function near(i) { for (var d = 0; d < N; d++) { if (bmp[i - d]) return i - d; if (bmp[i + d]) return i + d; } return -1; }
-    function draw(f) {
-      var c = Math.floor(f);
-      for (var k = -3; k <= 6; k++) want(c + k);
-      for (var key in bmp) if ((key < c - 8 || key > c + 10) && +key !== 0) { if (bmp[key].close) bmp[key].close(); delete bmp[key]; }
-      var a = bmp[c] ? c : near(c); if (a < 0) return false;
-      var t = (a === c && bmp[c + 1]) ? f - c : 0;
-      var k2 = Math.round(f * 200); if (k2 === lastKey) return true; lastKey = k2;
-      ctx.globalAlpha = 1; ctx.drawImage(bmp[a], 0, 0, cv.width, cv.height);
-      if (t > .01) { ctx.globalAlpha = t; ctx.drawImage(bmp[c + 1], 0, 0, cv.width, cv.height); ctx.globalAlpha = 1; }
-      return true;
-    }
-    function tick() {
-      raf = 0;
-      var d = target - cur;
-      cur = Math.abs(d) < .0004 ? target : cur + d * .2;    // eased follow: glides to the scroll position
-      var ok = draw(cur * (N - 1));
-      if (ok && !cv.classList.contains('on')) cv.classList.add('on');
-      if (cur !== target) raf = requestAnimationFrame(tick);
-    }
-    function kick() { if (!raf) raf = requestAnimationFrame(tick); }
-    function onScroll() {
-      var y = window.pageYOffset; if (y > H && target === 1 && cur === 1) return;
-      target = Math.min(1, Math.max(0, y / (H * (fine ? .55 : .42))));   // reaches night in about half a screen
-      kick();
-    }
-    load(0, function () {
-      onScroll(); cur = target; lastKey = -1; want(0);
-      for (var i = 1; i < N; i++) load(i);      // all frames straight away (already downloading)
-    });
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', function () { H = hero.offsetHeight; });
-  })();
+  /* HERO film: see film.js (loaded on its own so it starts before everything else) */
 
   /* ---------- HERO depth ----------
      Scroll parallax is pure CSS (scroll-driven animations, see home.css) so it moves exactly

@@ -6,6 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; media-src 'self'; connect-src https://formsubmit.co; form-action 'self' https://formsubmit.co; frame-src 'none'; worker-src 'none'; object-src 'none'; base-uri 'self'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <script src="assets/js/boot.js"></script>
+<script src="assets/js/film.js" async></script>
 <title>WABI Architects — Architecture, Interiors &amp; Finishing, Addis Ababa</title>
 <meta name="description" content="WABI Architects is a design and finishing studio in Addis Ababa — architecture, interior design, tile, marble and gypsum finishing, and site supervision from one team.">
 <meta name="theme-color" content="#08080a">
@@ -83,7 +84,7 @@
         <source media="(max-aspect-ratio: 4/5)" srcset="assets/img/hero-still-portrait.jpg">
         <img src="assets/img/hero-still.jpg" fetchpriority="high" alt="Cityscape architectural model of Addis Ababa">
       </picture>
-      <canvas class="hero-film" aria-hidden="true"></canvas>
+      <canvas class="hero-film" width="1" height="1" aria-hidden="true"></canvas>
     </div>
     <div class="hero-sky" aria-hidden="true"></div>
     <div class="hero-frame" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -164,7 +165,7 @@
     <div class="gal" aria-label="Recent projects">
       <div class="gal-rail">
         <a class="gal-card work" href="projects.html#gulifa-coffee" style="--i:0">
-          <div class="gal-media"><img src="assets/img/projects/gulifa-coffee/sm/01.jpg" alt="Gulifa Coffee café pavilion" loading="lazy" decoding="async"></div>
+          <div class="gal-media"><img src="assets/img/projects/gulifa-coffee/sm/01.jpg" alt="Gulifa Coffee café pavilion" loading="lazy" decoding="async" fetchpriority="low"></div>
           <div class="gal-body">
             <span class="gal-n">01</span><span class="gal-cat">Café · Hospitality</span>
             <h3>Gulifa Coffee</h3>
@@ -172,7 +173,7 @@
           </div>
         </a>
         <a class="gal-card work" href="projects.html#ascent-hotel" style="--i:1">
-          <div class="gal-media"><img src="assets/img/projects/ascent-hotel/sm/01.jpg" alt="Ascent Hotel rooftop" loading="lazy" decoding="async"></div>
+          <div class="gal-media"><img src="assets/img/projects/ascent-hotel/sm/01.jpg" alt="Ascent Hotel rooftop" loading="lazy" decoding="async" fetchpriority="low"></div>
           <div class="gal-body">
             <span class="gal-n">02</span><span class="gal-cat">Hotel</span>
             <h3>Ascent Hotel</h3>
@@ -180,7 +181,7 @@
           </div>
         </a>
         <a class="gal-card work" href="projects.html#residence-lounge-entertainment" style="--i:2">
-          <div class="gal-media"><img src="assets/img/projects/residence-lounge-entertainment/sm/01.jpg" alt="Residence lounge interior" loading="lazy" decoding="async"></div>
+          <div class="gal-media"><img src="assets/img/projects/residence-lounge-entertainment/sm/01.jpg" alt="Residence lounge interior" loading="lazy" decoding="async" fetchpriority="low"></div>
           <div class="gal-body">
             <span class="gal-n">03</span><span class="gal-cat">Residential Interior</span>
             <h3>Residence Lounge &amp; Entertainment</h3>
@@ -188,7 +189,7 @@
           </div>
         </a>
         <a class="gal-card work" href="projects.html#oec-headquarters" style="--i:3">
-          <div class="gal-media"><img src="assets/img/projects/oec-headquarters/sm/01.jpg" alt="OEC headquarters exterior" loading="lazy" decoding="async"></div>
+          <div class="gal-media"><img src="assets/img/projects/oec-headquarters/sm/01.jpg" alt="OEC headquarters exterior" loading="lazy" decoding="async" fetchpriority="low"></div>
           <div class="gal-body">
             <span class="gal-n">04</span><span class="gal-cat">Renovation · Office</span>
             <h3>OEC Headquarters</h3>
@@ -196,7 +197,7 @@
           </div>
         </a>
         <a class="gal-card work" href="projects.html#rooftop-restaurant-lounge" style="--i:4">
-          <div class="gal-media"><img src="assets/img/projects/rooftop-restaurant-lounge/sm/01.jpg" alt="Rooftop restaurant and lounge" loading="lazy" decoding="async"></div>
+          <div class="gal-media"><img src="assets/img/projects/rooftop-restaurant-lounge/sm/01.jpg" alt="Rooftop restaurant and lounge" loading="lazy" decoding="async" fetchpriority="low"></div>
           <div class="gal-body">
             <span class="gal-n">05</span><span class="gal-cat">Hospitality</span>
             <h3>Rooftop Restaurant &amp; Lounge</h3>
@@ -354,7 +355,7 @@
     <div class="flow-stage">
       <div class="flow-pin">
     <div class="flow-media" aria-live="polite">
-      <img class="on" data-step="0" src="assets/img/hero-model.jpg" alt="Concept: city-scale massing model" loading="lazy" decoding="async">
+      <img class="on" data-step="0" src="assets/img/hero-model.jpg" alt="Concept: city-scale massing model" loading="lazy" decoding="async" fetchpriority="low">
       <img data-step="1" src="assets/img/post-gulifa.jpg" alt="Design: Gulifa Coffee render" loading="lazy">
       <img data-step="2" class="fit" src="assets/img/stage-detailing.jpg" alt="Detailing: front elevation and section of the B+G+7 apartment" loading="lazy">
       <img data-step="3" src="assets/img/stage-finishing.jpg" alt="Finishing: tile being laid on site" loading="lazy">
@@ -432,7 +433,7 @@
 
   <!-- CTA -->
   <section class="cta">
-    <div class="cta-bg"><img src="assets/img/hero-final.jpg" alt="Cityscape architectural model" loading="lazy" decoding="async"></div>
+    <div class="cta-bg"><img src="assets/img/hero-final.jpg" alt="Cityscape architectural model" loading="lazy" decoding="async" fetchpriority="low"></div>
     <span class="label no-tick reveal" style="justify-content:center">Get in touch</span>
     <h2 class="reveal" data-delay="1">Let's build something enduring.</h2>
     <p class="reveal" data-delay="1">Connect with WABI to discuss your project and explore how we can create enduring,
