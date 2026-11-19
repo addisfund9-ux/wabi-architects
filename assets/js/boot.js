@@ -1,6 +1,20 @@
 /* mark JS available + failsafe so content can never stay hidden */
 document.documentElement.classList.add('js');
 window.__revealTimer = setTimeout(function () { document.documentElement.classList.add('reveal-all'); }, 2600);
+/* home page: the hero film frames are requested first, before anything else on the page */
+(function () {
+  var n = +document.documentElement.getAttribute('data-film'); if (!n) return;
+  var c = navigator.connection;
+  if ((c && c.saveData) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  var set = (window.innerWidth / window.innerHeight < 0.8) ? 'p' : 'l', imgs = [];
+  for (var i = 0; i < n; i++) {
+    var im = new Image(); im.decoding = 'async';
+    if ('fetchPriority' in im) im.fetchPriority = i < 16 ? 'high' : 'auto';
+    im.src = 'assets/media/hero-seq/' + set + '/' + (i < 10 ? '0' : '') + i + '.webp';
+    imgs.push(im);
+  }
+  window.__film = { set: set, imgs: imgs };
+})();
 /* small (960px) versions of project pictures live in .../sm/ — used for cards and lists.
    If one is missing (e.g. a project just added), the full picture is used instead. */
 window.WABI_SM = function (src) { return String(src || '').replace(/(assets\/img\/projects\/[^\/]+\/)([^\/]+\.jpg)$/, '$1sm/$2'); };

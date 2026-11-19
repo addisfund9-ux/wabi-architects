@@ -230,11 +230,14 @@
     cv.parentNode.classList.add('has-video');
 
     function pad(i) { return (i < 10 ? '0' : '') + i; }
+    var pre = window.__film && window.__film.set === set ? window.__film.imgs : null;   // already requested in <head>
     function load(i, done) {
-      var im = new Image(); im.decoding = 'async';
-      im.onload = function () { raw[i] = im; if (!sized) { cv.width = im.naturalWidth; cv.height = im.naturalHeight; sized = true; } if (done) done(); kick(); };
-      im.onerror = function () { if (done) done(); };
-      im.src = base + pad(i) + '.webp';
+      var im = (pre && pre[i]) || new Image();
+      function ok() { raw[i] = im; if (!sized) { cv.width = im.naturalWidth; cv.height = im.naturalHeight; sized = true; } if (done) done(); kick(); }
+      function bad() { if (done) done(); }
+      if (im.complete && im.src) { if (im.naturalWidth) ok(); else bad(); return; }
+      im.decoding = 'async'; im.onload = ok; im.onerror = bad;
+      if (!im.src) im.src = base + pad(i) + '.webp';
     }
     function want(i) {
       if (i < 0 || i >= N || !raw[i] || bmp[i] || pend[i]) return;
@@ -258,28 +261,20 @@
     function tick() {
       raf = 0;
       var d = target - cur;
-      cur = Math.abs(d) < .0004 ? target : cur + d * .12;   // eased follow: glides to the scroll position
+      cur = Math.abs(d) < .0004 ? target : cur + d * .2;    // eased follow: glides to the scroll position
       var ok = draw(cur * (N - 1));
       if (ok && !cv.classList.contains('on')) cv.classList.add('on');
       if (cur !== target) raf = requestAnimationFrame(tick);
     }
     function kick() { if (!raf) raf = requestAnimationFrame(tick); }
     function onScroll() {
-      var y = window.pageYOffset; if (y > H * 1.4 && target === 1 && cur === 1) return;
-      target = Math.min(1, Math.max(0, y / (H * (fine ? 1 : .7))));
+      var y = window.pageYOffset; if (y > H && target === 1 && cur === 1) return;
+      target = Math.min(1, Math.max(0, y / (H * (fine ? .55 : .42))));   // reaches night in about half a screen
       kick();
     }
     load(0, function () {
       onScroll(); cur = target; lastKey = -1; want(0);
-      var i = 1, began = false;
-      var rest = function () {                 // the other frames: once the visitor scrolls,
-        if (began) return; began = true;       // or (desktop) a few seconds after the page has settled
-        window.removeEventListener('scroll', rest);
-        (function next() { for (var k = 0; k < 4 && i < N; k++, i++) load(i, k === 3 || i === N - 1 ? next : null); })();
-      };
-      window.addEventListener('scroll', rest, { passive: true });
-      var idle = function () { setTimeout(rest, 2500); };
-      if (fine) { if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle); }
+      for (var i = 1; i < N; i++) load(i);      // all frames straight away (already downloading)
     });
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', function () { H = hero.offsetHeight; });
