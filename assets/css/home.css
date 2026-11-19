@@ -120,13 +120,7 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:400;line-height:1.02;letter-s
   padding:0 var(--pad) clamp(40px,7vh,80px);overflow-x:clip;overflow-y:visible}
 .hero-media{position:absolute;inset:0;z-index:-2;overflow:hidden;
   -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 100%);mask-image:linear-gradient(to bottom,#000 62%,transparent 100%)}
-.hero-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);
-  will-change:transform;animation:kenburns 24s ease-in-out infinite alternate}
-.hero-film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s ease}
-.hero-film.on{opacity:1}
-.hero-media .hero-film img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;visibility:hidden;
-  transform:none!important;animation:none!important}
-.hero-media.has-video img{animation:none;transform:none}
+.hero-media img{width:100%;height:100%;object-fit:cover}   /* the white model: a still picture */
 @keyframes kenburns{0%{transform:scale(1.08) translate(0,0)}100%{transform:scale(1.18) translate(-2%,-2%)}}
 .hero-media::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(8,8,10,.55) 0%,rgba(8,8,10,.2) 35%,rgba(8,8,10,.75) 78%,var(--bg) 100%)}
@@ -392,7 +386,6 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
   .reveal,.reveal-img,.hero h1 .line > span,.hero-sub{opacity:1!important;transform:none!important;clip-path:none!important}
   #preloader{display:none}
   .hero-media img{transform:scale(1.05)!important}
-  .hero-film{display:none}
 }
 
 /* ============================================================
@@ -631,6 +624,9 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
     .hero h1 .line:nth-child(1),.page-hero h1{animation:px-l1 linear both}
     .hero h1 .line:nth-child(2){animation:px-l2 linear both}
     .hero h1 .line:nth-child(3){animation:px-l3 linear both}
+    /* the line rules above are more specific than the shared rule below, so pin their timeline here
+       (without this the headline played its exit instantly and stayed invisible on desktop) */
+    .hero h1 .line:nth-child(n){animation-timeline:scroll(root block);animation-range:0 100svh}
     .hero-top,.page-hero .ph-top{animation:px-top linear both}
     .hero-sub,.page-hero .ph-sub{animation:px-sub linear both}
     .hero-frame{animation:px-frame linear both}
@@ -657,7 +653,7 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
    (moving/scaling a playing video while scrolling stutters on many Android phones),
    and no live blur behind the header. */
 @media (hover:none),(pointer:coarse){
-  .hero-media img,.hero-film{transform:none!important;animation:none!important}
+  .hero-media img{transform:none!important;animation:none!important}
   .site-header,.site-header.scrolled{backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .3s}
   .site-header.scrolled{background:rgba(8,8,10,.94)}
 }

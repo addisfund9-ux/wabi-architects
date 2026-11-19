@@ -212,8 +212,6 @@
     });
   })();
 
-  /* HERO film: see film.js (loaded on its own so it starts before everything else) */
-
   /* ---------- HERO depth ----------
      Scroll parallax is pure CSS (scroll-driven animations, see home.css) so it moves exactly
      with the scroll. Here: a gentle pointer drift on desktop (uses the separate `translate`
