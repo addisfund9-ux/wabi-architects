@@ -151,6 +151,8 @@
      are, so the work is only cross-fading (cheap on any phone). Pictures load after the page. */
   (function () {
     var root = document.createElement('div'); root.className = 'atmo'; root.setAttribute('aria-hidden', 'true');
+    var grid = document.createElement('i'); grid.className = 'grid'; root.appendChild(grid);
+    document.documentElement.classList.add('atmo-on');
     var defs = [   // [class, picture, fade in from, full from, full until, fade out by, max opacity]
       ['stars', 'stars-a.svg', -1, 0, 1, 2, .55],
       ['stars2', 'stars-b.svg', -1, 0, 1, 2, 1],
@@ -166,7 +168,7 @@
       defs.forEach(function (d, k) { layers[k].style.backgroundImage = 'url(' + base + d[1] + ')'; });
     }
     if (document.readyState === 'complete') setTimeout(loadAll, 600); else window.addEventListener('load', function () { setTimeout(loadAll, 600); });
-    var gridEl = document.documentElement, q = false, max = 1;
+    var q = false, max = 1, lastG = '';
     function measure() { max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
     function amt(p, a, b, c, d) { return p < a || p > d ? 0 : p < b ? (p - a) / (b - a) : p <= c ? 1 : 1 - (p - c) / (d - c); }
     function paint() {
@@ -178,7 +180,8 @@
         layers[k].style.opacity = (v * d[6]).toFixed(3);
         layers[k].style.transform = 'scale(' + (1.06 - v * .06).toFixed(3) + ') rotate(' + ((1 - v) * (k % 2 ? -2 : 2)).toFixed(2) + 'deg)';
       });
-      gridEl.style.setProperty('--grid', Math.max(.2, 1 - p * 4).toFixed(3));   // the grid gives way to the drawings
+      var g = Math.max(.2, 1 - p * 4).toFixed(2);                     // the grid gives way to the drawings
+      if (g !== lastG) { grid.style.opacity = g; lastG = g; }
     }
     window.addEventListener('scroll', function () { if (!q) { q = true; requestAnimationFrame(paint); } }, { passive: true });
     window.addEventListener('resize', function () { measure(); paint(); });

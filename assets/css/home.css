@@ -768,7 +768,7 @@ footer{position:relative;z-index:2;background:#050506;border-top:1px solid var(-
 /* ---------- atmosphere: the page sits on a faint drafting sheet with warm light,
    instead of flat black. Two layers behind everything, painted once. ---------- */
 body{isolation:isolate;background:#07080a}
-body::before{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;opacity:var(--grid,1);
+body::before,.atmo .grid{content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
   background:
     linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px) 0 0/100% 96px,
     linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px) 0 0/96px 100%,
@@ -817,3 +817,18 @@ body::after{content:"";position:absolute;left:0;right:0;top:0;bottom:0;z-index:-
 .page-hero .ph-media,.page-hero .ph-split,.page-hero .ph-tri{
   -webkit-mask-image:linear-gradient(to bottom,#000 50%,rgba(0,0,0,.6) 75%,transparent 100%);
   mask-image:linear-gradient(to bottom,#000 50%,rgba(0,0,0,.6) 75%,transparent 100%)}
+
+/* the grid lives in the atmosphere layer once scripts run, so fading it touches one element,
+   not the whole page (setting a page-wide variable on every scroll frame made phones stutter) */
+.atmo-on body::before{display:none}
+.atmo .grid{position:absolute;opacity:1}
+/* fixed backgrounds keep the full screen height, so they don't stretch when the phone's
+   address bar slides away at the start of a scroll */
+@supports (height:100lvh){
+  .atmo,body::before{inset:auto;top:0;left:0;width:100%;height:100lvh}
+}
+/* phones: the header keeps its size when you start scrolling (only its background fades in) */
+@media (hover:none),(pointer:coarse){
+  .site-header,.site-header.scrolled{padding:16px var(--pad)}
+  .brand img,.site-header.scrolled .brand img{height:36px;transition:none}
+}
