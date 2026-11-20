@@ -426,3 +426,6 @@ html.no-scroll{overflow:hidden}
   .t-elev .e-draw{display:flex;justify-content:center}
   .t-elev .e-draw svg{height:auto;width:min(100%,280px);max-height:210px}
 }
+
+/* phones: the filter bar docks right under the (fixed-size) header */
+@media (hover:none),(pointer:coarse){.reg-bar{top:68px}}
